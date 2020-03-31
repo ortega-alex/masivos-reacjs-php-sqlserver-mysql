@@ -65,7 +65,7 @@ class Menu extends Component {
                                 <span>Configuracion</span>
                             </span>
                         }
-                        className="menu-user"
+                        style={{ marginLeft:  window.innerWidth < 500 ? 0 : window.innerWidth - 500 }}
                     >
                         <Item disabled="true">
                             <Icon type="user" />
@@ -78,7 +78,7 @@ class Menu extends Component {
                     </SubMenu>
                 </MenuAntd>
 
-                <div className="container mt-3">
+                <div className="m-3">
                     <Route path="/" exact component={Mail} />
                     <Route path="/message" component={Message} />
                 </div>

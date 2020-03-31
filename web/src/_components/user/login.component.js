@@ -5,7 +5,7 @@ import { Input, Form, Icon } from "antd";
 import UserActions from "../../_actionts/user.actionts";
 
 const { Item } = Form;
-// const _fondo = require('../../media/fondo.jpg');
+// const _fondo = require('../../_media/fondo.jpg');
 
 class Login extends Component {
 

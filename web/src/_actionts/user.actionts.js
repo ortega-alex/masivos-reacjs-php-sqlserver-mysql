@@ -1,6 +1,5 @@
 import { AsyncStorage } from 'AsyncStorage';
 import { UserConstants } from '../_constants/index';
-
 import http from '../_services/http.services';
 
 var moment = require('moment');
@@ -25,7 +24,7 @@ function login(data) {
             }
         }).catch(err => {
             dispatch(failure(err.toString()));
-        })
+        });
     }
 }
 

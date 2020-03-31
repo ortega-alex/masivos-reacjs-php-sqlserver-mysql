@@ -7,6 +7,8 @@ import Login from "./user/login.component";
 import Menu from "./menu/menu.component";
 import Loading from "../_hepers/Loading";
 
+const _fondo = require('../_media/fondo.jpg');
+
 class App extends Component {
     constructor(props) {
         super(props);
@@ -24,7 +26,7 @@ class App extends Component {
         const { cargando, login } = this.state;
         return (
             <Provider store={store}>
-                <div className="app">
+                <div className="app" style={{ backgroundImage: `url(${_fondo})` }}>
                     {(cargando == true) &&
                         <div className="fondo fondo-gradiend">
                             <Loading />
