@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { HashRouter, Route, Link } from 'react-router-dom';
-import { Menu as MenuAntd, Button, Switch, Icon, Tooltip } from 'antd';
+import { Menu as MenuAntd, Icon } from 'antd';
 import { AsyncStorage } from 'AsyncStorage';
 
 import UserActions from "../../_actionts/user.actionts";

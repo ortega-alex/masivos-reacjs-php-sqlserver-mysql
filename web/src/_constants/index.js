@@ -11,7 +11,17 @@ const MailConstants = {
     GET_MAIL: 'GET_MAIL'
 }
 
+const ClientConstants = {
+    REQUEST_CLIENT: 'REQUEST_CLIENT',
+    FAILURE_CLIENT: 'FAILURE_CLIENT',
+    SUCCESS_CLIENT: 'SUCCESS_CLIENT',
+    GET_CLIENT_ACT: 'GET_CLIENT_ACT',
+    GET_PRODUC_CLIENT: 'GET_PRODUC_CLIENT',
+    GET_TEXT_CLIENT: 'GET_TEXT_CLIENT'
+}
+
 export {
     UserConstants,
-    MailConstants
+    MailConstants,
+    ClientConstants
 };

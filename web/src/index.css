@@ -38,7 +38,7 @@ code {
     width: 25%;
     justify-content: center;
     align-items: 'center';
-    background-color: rgba(227, 231, 233, 0.5);
+    background-color: #e3e7e980;
     border-radius: 10px;
     flex-direction: column;
     box-shadow: 0px 1px 4px #909497;
@@ -69,8 +69,28 @@ code {
 }
 
 .ag-theme-balham {
-    background-color:#39393933;
+    background-color: #39393933;
     border-radius: 5px;
     margin: 10px 15px;
     padding: 10px 0px;
+}
+
+.ant-divider, .ant-col, .ant-form-item-label, .ant-form-item-required, .label {
+    margin: 0px !important;
+    padding: 0px !important;
+}
+
+.head-modal {
+    border-radius: 5px;
+    background-color: #1890ff;
+    padding: 3px;
+    color: white;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0%;
+    left: 0%;
+    width: 100%;
+    padding: 2%;
 }
