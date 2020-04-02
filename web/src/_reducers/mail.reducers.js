@@ -22,6 +22,11 @@ export default function _mails(state = {}, action) {
                 ...state,
                 mails: action.mails
             };
+        case MailConstants.GET_LOT:
+            return {
+                ...state,
+                lote: action.lote
+            };
         default:
             return state
     }

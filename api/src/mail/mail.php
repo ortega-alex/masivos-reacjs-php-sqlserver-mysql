@@ -26,12 +26,13 @@ $arrDestination = isset($_POST['destination']) ? explode(',', $_POST['destinatio
 array('m.ortega@ocacall.oca', 'mortegalex27@gmail.com', 'ortegalexbleach@gmail.com', 'mortegalex27@outlook.es');
 $strBody = isset($_POST['body']) ? trim($_POST['body']) : '<b>Esto es una prueba</b>';
 
-$dtDateStartLot = isset($_POST['date_start_lot']) ? date('Y-m-d', strtotime($_POST['date_start_lot'])) : date('Y-m-d');
-$dtDateEndLot = isset($_POST['date_end_lot']) ? date('Y-m-d H:m:s', strtotime($_POST['date_end_lot'] . " 23:59:59")) : date('Y-m-d') . " 23:59:59";
 $strNombre = isset($_POST['nombre']) ? trim($_POST['nombre']) : '';
-$intIdCliente = isset($_POST['id_cliente']) ? int($_POST['id_cliente']) : 0;
-$intIdProducto = isset($_POST['id_producto']) ? int($_POST['id_producto']) : 0;
+$intIdCliente = isset($_POST['id_cliente']) ? intval($_POST['id_cliente']) : 0;
+$intIdProducto = isset($_POST['id_producto']) ? intval($_POST['id_producto']) : 0;
+$intIdTexto = isset($_POST['id_texto']) ? intval($_POST['id_texto']) : 0;
 $strTexto = isset($_POST['texto']) ? trim($_POST['texto']) : '';
+$intIdUsuario = isset($_POST['id_usuario']) ? intval($_POST['id_usuario']) : 0;
+$intIdThread = isset($_POST['id_thread']) ? intval($_POST['id_thread']) : 1;
 
 if (isset($_GET['get'])) {
     $strQuery = "SELECT a.Id_outbound_correos, a.control, a.email, a.enviado, a.fecha_envio, a.fecha_creacion, a.id_thread,
@@ -66,35 +67,109 @@ if (isset($_GET['get'])) {
 }
 
 if (isset($_GET['lot'])) {
-    $strQuery = "creacion de lote pra identificar posterior mente como filtro y determinar estado del mismo";
+    // if ($intIdThread <= 0) {
+    //     $strQuery = "   INSERT INTO masivos.dbo.thread (id_usuario, id_cliente, id_producto, id_texto, name)
+    //                     VALUES ({$intIdUsuario}, {$intIdCliente}, {$intIdProducto}, {$intIdTexto}, '{$strNombre}')";
+    //     if ($_con->db_consulta($strQuery)) {
+    //         $strQuery = "   SELECT IDENT_CURRENT('masivos.dbo.thread') AS id";
+    //         $qTmp = $_con->db_consulta($strQuery);
+    //         $rTmp = $_con->db_fetch_assoc($qTmp);
+    //         $intIdThread = $rTmp['id'];
+    //     }
+    // }
 
-    $strQuery = "   SELECT a.id_remesa, a.no_linea, b.control 
-                    FROM remesas a
-                    INNER JOIN remesas_cuentas b ON a.id_remesa = b.id_remesa
-                    INNER JOIN gestiones_claves c ON b.id_gestion_clave  = c.id_gestion_clave 
-                    WHERE c.id_gestion_clave  NOT IN(2,27, 19, 13, 14, 25, 24)
-                    AND a.id_cliente = {$intIdCliente}
-                    AND a.id_producto = {$intIdProducto}
-                    AND b.fecha_ultima_gestion  BETWEEN '{$dtDateStartLot}' AND '$dtDateEndLot'";
+    // $strQuery = "   SELECT a.id_remesa, b.no_linea, b.control
+    //                 FROM oca_sac.dbo.remesas a
+    //                 INNER JOIN oca_sac.dbo.remesas_cuentas b ON a.id_remesa = b.id_remesa
+    //                 INNER JOIN oca_sac.dbo.gestiones_claves c ON b.id_gestion_clave  = c.id_gestion_clave
+    //                 WHERE c.id_gestion_clave  NOT IN(2, 14, 17, 19, 24, 27, 33, 125, 127)
+    //                 AND a.id_cliente = {$intIdCliente}
+    //                 AND a.id_producto = {$intIdProducto}";
+
+    // $qTmp = $_con->db_consulta($strQuery);
+    // $arr = array();
+    // $index = 0;
+    // $count = 0;
+    // while ($rTmp = $_con->db_fetch_object($qTmp)) {
+    //     $strQuery1 = "  SELECT valor
+    //                     FROM oca_sac.dbo.remesas_cuentas_campos_adicionales
+    //                     WHERE valor LIKE'%@%'
+    //                     AND id_remesa = {$rTmp->id_remesa}
+    //                     AND no_linea = {$rTmp->no_linea}";
+    //     $qTmp1 = $_con->db_consulta($strQuery1);
+    //     $arrEmails = array();
+    //     $_index = 0;
+
+    //     while ($rTmp1 = $_con->db_fetch_object($qTmp1)) {
+    //         if (istAValidEmail($rTmp1->valor)) {
+    //             $arrEmails[$_index] = $rTmp1->valor;
+    //             $_index++;
+    //         }
+    //     }
+
+    //     if (sizeof($arrEmails) > 0) {
+    //         $emails = implode(',', $arrEmails);
+    //         $intEnviado = 0;
+    //     } else {
+    //         $emails = "No valido o no cuenta con correo";
+    //         $intEnviado = 4;
+    //     }
+
+    //     if ($count >= 100) {
+    //         $index++;
+    //         $count = 0;
+    //     }
+
+    //     $arr[$index][$count] = "('{$rTmp->control}', '{$emails}', {$intIdTexto}, {$intIdUsuario}, {$intEnviado}, NULL, {$intIdThread})";
+    //     $count++;
+    // }
+
+    // foreach ($arr as $key => $value) {
+    //     $VALUES = implode(',', $value);
+    //     $strQuery = "   INSERT INTO masivos.dbo.outbound_correos (control, email, id_texto , id_usuario_envia, enviado, fecha_envio, id_thread )
+    //                     VALUES {$VALUES}";
+    //     $qTmp = $_con->db_consulta($strQuery);
+    // }
+
+    $strQuery = "   SELECT email
+                    FROM masivos.dbo.outbound_correos
+                    WHERE enviado = 0
+                    AND id_thread = {$intIdThread}";
+
     $qTmp = $_con->db_consulta($strQuery);
+
     $arr = array();
-    while ( $rTmp = $_con->db_fetch_object($qTmp) ) {
-        $strQuery1 = "  SELECT valor 
-                        FROM remesas_cuentas_campos_adicionales 
-                        WHERE valor LIKE'%@%'
-                        AND id_remesa = {$rTmp->id_remesa}
-                        AND no_linea = {$rTmp->no_linea}";
-        $qTmp1 = $_con->db_consulta($strQuery1);
-        $arrEmails = array();
-        if ( $_con->db_num_rows($qTmp1) > 0) {
-            while($rTmp1 = $_con->db_fetch_object($qTmp1)) {
-                $arrEmails[] = $rTmp1->valor; 
-            }
-            $strQuery2 = "";
-        } else {
-            $strQuery2 = "";
+    $index = 0;
+    $count = 0;
+    while ($rTmp = $_con->db_fetch_object($qTmp)) {
+
+        if ($count >= 100) {
+            $index++;
+            $count = 0;
         }
+
+        $arr[$index][$count] = $rTmp->email;
+        $count++;
     }
+
+    $strQuery = "   SELECT a.id_thread, a.name,
+                        b.Id_texto , b.subject, b.body, b.sender
+                    FROM masivos.dbo.thread a
+                    INNER JOIN masivos.dbo.correos_textos b ON a.id_texto = b.Id_texto
+                    WHERE a.id_thread = {$intIdThread}
+                    AND a.id_usuario = {$intIdUsuario}";
+    $qTmp = $_con->db_consulta($strQuery);
+    $rTmp = $_con->db_fetch_assoc($qTmp);
+    $arrThread = array(
+        'id_thread' => $rTmp['id_thread'],
+        'name' => mb_convert_encoding(($rTmp['name']), "UTF-8"),
+        'id_texto' => $rTmp['Id_texto'],
+        'subject' => mb_convert_encoding(($rTmp['subject']), "UTF-8"),
+        'body' => mb_convert_encoding(($rTmp['body']), "UTF-8"),
+        'sender' => $rTmp['sender']
+    );
+    $res['lote'] = $arr;
+    $res['thread'] = $arrThread;
 }
 
 if (isset($_GET['send'])) {

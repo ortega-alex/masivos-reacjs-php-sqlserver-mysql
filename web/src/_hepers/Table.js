@@ -90,11 +90,15 @@ class Table extends Component {
     handleStatus(res, i) {
         return (
             <AgGridColumn key={i} headerName={res.header} field={res.value} width={15} minWidth={100}
-                cellStyle={(param) => (param.value) >= 1 ? { color: 'green' } : { color: 'red' }}
+                cellStyle={(param) => ((param.value) == 1 || (param.value) == 2) ? { color: 'green' } : { color: 'red' }}
                 cellRendererFramework={(param) => {
                     return (
                         <div className="text-center">
-                            <FontAwesomeIcon icon={(param.value == 1) ? faCheck : (param.value == 2 ? faCheckDouble : faBan)} />
+                            {param.value > 0 ? 
+                                <FontAwesomeIcon 
+                                    icon={(param.value == 1) ? faCheck : (param.value == 2 ? faCheckDouble : faBan)} 
+                                />
+                            : ''}
                         </div>
                     );
                 }}

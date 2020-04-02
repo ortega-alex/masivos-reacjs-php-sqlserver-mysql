@@ -3,8 +3,8 @@ import http from '../_services/http.services';
 
 function request() { return { type: MailConstants.REQUEST_MAIL } }
 function failure(err) { return { type: MailConstants.FAILURE_MAIL, err } }
-function success(tipo, msj) { return { type: MailConstants.SUCCESS, tipo, msj } }
 function getSucess(mails) { return { type: MailConstants.GET_MAIL, mails } }
+function getLotSucess(lote) { return { type: MailConstants.GET_LOT, lote } }
 
 function get(data) {
     return dispatch => {
@@ -17,6 +17,18 @@ function get(data) {
     }
 }
 
+function getLote(data) {
+    return dispatch => {
+        dispatch(request());
+        http._POST("mail/mail.php?lot=true", data).then(res => {
+            dispatch(getLotSucess(res.lote));
+        }).catch(err => {
+            dispatch(failure(err.toString()));
+        });
+    }
+}
+
 export default {
-    get
+    get,
+    getLote
 };

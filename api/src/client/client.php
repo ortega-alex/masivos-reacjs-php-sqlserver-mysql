@@ -56,10 +56,11 @@ if (isset($_GET['get_textos_cliente'])) {
                     AND suspendido = 0
                     AND individual = 0
                     ORDER BY nombre";
+    $qTmp = $_con->db_consulta($strQuery);
     $arr = array();
     while ($rTmp = $_con->db_fetch_object($qTmp)) {
         $arr[] = array(
-            'id_producto' => $rTmp->id_producto,
+            'id_texto' => $rTmp->id_texto,
             'nombre' => $rTmp->nombre,
             'body' => $rTmp->body,
         );
