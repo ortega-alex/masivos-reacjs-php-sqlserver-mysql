@@ -20,6 +20,10 @@ CREATE TABLE masivos.dbo.thread (
 	id_cliente int NULL,
 	id_producto int NULL,
 	id_texto int NULL,
-	name varchar(100) NULL,
-	fecha_creacion datetime DEFAULT getdate() NULL
+	name varchar(100) COLLATE Modern_Spanish_CI_AS NULL,
+	fecha_creacion datetime NULL,
+	send int NULL,
+	percentage int NULL,
+	[length] int NULL,
+	status bit NULL
 ) GO
