@@ -9,7 +9,8 @@ const MailConstants = {
     FAILURE_MAIL: 'FAILURE_MAIL',
     SUCCESS_MAIL: 'SUCCESS_MAIL',
     GET_MAIL: 'GET_MAIL',
-    GET_LOT: 'GET_LOT'
+    GET_LOT: 'GET_LOT',
+    GET_THREADS: 'GET_THREADS'
 }
 
 const ClientConstants = {

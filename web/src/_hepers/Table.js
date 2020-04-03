@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faLock, faCheck, faFileAlt, faTrash, faCheckDouble, faBan } from '@fortawesome/free-solid-svg-icons';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 
-import Fuctions from './Fuctions';
+import Functions from './Functions';
 
 class Table extends Component {
     constructor(props) {
@@ -64,7 +64,7 @@ class Table extends Component {
                 cellRendererFramework={(param) => {
                     return (
                         <div style={{ color: (param.value < 0) ? '#dc3545' : '#343a40' }}>
-                            {param.value != null ? Fuctions.commaSeparateNumber(parseFloat(param.value).toFixed(2)) : ''}
+                            {param.value != null ? Functions.commaSeparateNumber(parseFloat(param.value).toFixed(2)) : ''}
                         </div>
                     );
                 }}
@@ -90,15 +90,13 @@ class Table extends Component {
     handleStatus(res, i) {
         return (
             <AgGridColumn key={i} headerName={res.header} field={res.value} width={15} minWidth={100}
-                cellStyle={(param) => ((param.value) == 1 || (param.value) == 2) ? { color: 'green' } : { color: 'red' }}
+                cellStyle={(param) => ((param.value == 0) ? { color: '#e0e0e0' } : ((param.value) == 1 || (param.value) == 2) ? { color: 'green' } : { color: 'red' })}
                 cellRendererFramework={(param) => {
                     return (
                         <div className="text-center">
-                            {param.value > 0 ? 
-                                <FontAwesomeIcon 
-                                    icon={(param.value == 1) ? faCheck : (param.value == 2 ? faCheckDouble : faBan)} 
-                                />
-                            : ''}
+                            <FontAwesomeIcon
+                                icon={(param.value == 0 || param.value == 1) ? faCheck : (param.value == 2 ? faCheckDouble : faBan)}
+                            />
                         </div>
                     );
                 }}

@@ -1,5 +1,5 @@
 import { UserConstants } from '../_constants/index';
-import Fuctions from '../_hepers/Fuctions';
+import Functions from '../_hepers/Functions';
 
 export default function _users(state = {}, action) {
     switch (action.type) {
@@ -8,12 +8,12 @@ export default function _users(state = {}, action) {
                 ...state
             };
         case UserConstants.FAILURE:
-            Fuctions.message("error", action.err.toString());
+            Functions.message("error", action.err.toString());
             return {
                 ...state
             };
         case UserConstants.SUCCESS:
-            Fuctions.message(action.tipo, action.msj.toString());
+            Functions.message(action.tipo, action.msj.toString());
             return {
                 ...state,
                 usuario: action.usuario

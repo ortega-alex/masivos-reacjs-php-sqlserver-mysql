@@ -1,5 +1,5 @@
 import { ClientConstants } from '../_constants/index';
-import Fuctions from '../_hepers/Fuctions';
+import Functions from '../_hepers/Functions';
 
 export default function _clients(state = {}, action) {
     switch (action.type) {
@@ -8,12 +8,12 @@ export default function _clients(state = {}, action) {
                 ...state
             };
         case ClientConstants.FAILURE_CLIENT:
-            Fuctions.message("error", action.err.toString());
+            Functions.message("error", action.err.toString());
             return {
                 ...state
             };
         case ClientConstants.SUCCESS_CLIENT:
-            Fuctions.message(action.tipo, action.msj.toString());
+            Functions.message(action.tipo, action.msj.toString());
             return {
                 ...state
             };

@@ -106,3 +106,10 @@ code {
     border-radius: 5px;
     box-shadow: 0px 5px 10px #909497;
 }
+
+.row-thread {
+    border-bottom: solid 1px lightgray;
+    display: flex;
+   justify-content: center;
+   align-items: center;
+}

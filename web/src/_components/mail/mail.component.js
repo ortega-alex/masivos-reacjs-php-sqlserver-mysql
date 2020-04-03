@@ -9,7 +9,7 @@ import mailActionts from "../../_actionts/mail.actionts";
 import Table from "../../_hepers/Table";
 import Form from "../../_hepers/Form";
 import clientActionts from "../../_actionts/client.actionts";
-import Fuctions from "../../_hepers/Fuctions";
+import Functions from "../../_hepers/Functions";
 
 require("moment/min/locales.min");
 moment.locale('es');
@@ -43,8 +43,8 @@ class Mail extends Component {
             modal: false,
             content: undefined,
             user: undefined,
-            notification: false,
-            percent: 0,
+            // notification: false,
+            // percent: 0,
             modal_lote: false
         };
     }
@@ -53,21 +53,21 @@ class Mail extends Component {
         AsyncStorage.getItem('login_massive', (err, res) => {
             if (!err && res && res != "undefined") {
                 var user = JSON.parse(res);
-                this.setState({ user: user, notification: true }, () => {
+                this.setState({ user: user }, () => {
                     console.log(this.state.user);
                 });
             }
         });
         this.handleGet();
         this.props.dispatch(clientActionts.getActivos());
-        setInterval(() => {
-            this.setState({ percent: this.state.percent + 1 });
-        }, 3000);
+        // setInterval(() => {
+        //     this.setState({ percent: this.state.percent + 1 });
+        // }, 3000);
     }
 
     render() {
-        const { date_start, date_end, modal, notification, modal_lote } = this.state;
-        const { mails } = this.props;
+        const { date_start, date_end, modal, modal_lote } = this.state;
+        const { mails, notification } = this.props;
         return (
             <div style={{ position: 'relative' }}>
                 {notification &&
@@ -123,7 +123,7 @@ class Mail extends Component {
                                     <Item onClick={() => { this.setState({ modal: true }) }} >
                                         <Icon type="plus-circle" />Nuevo
                                     </Item>
-                                    <Item onClick={() => { this.setState({ modal_lote: true, notification: false }) }}>
+                                    <Item onClick={this.handleGetLotes.bind(this)}>
                                         <Icon type="unordered-list" />Estado lotes
                                     </Item>
                                 </Menu>
@@ -208,6 +208,7 @@ class Mail extends Component {
         const { user } = this.state;
         values.id_usuario = user.id_usuario;
         this.props.dispatch(mailActionts.getLote(values));
+        Functions.message('info', 'lote creado. en unos momentos se procedera con el envido!');
     }
 
     handleOptionsChange(value) {
@@ -216,36 +217,48 @@ class Mail extends Component {
     }
 
     handleNotificacion() {
-        const { percent } = this.state;
+        const { thread } = this.props
         return (
             <div className="notificaion">
-                <div className="row">
-                    <div className="col-8 offset-2 text-center">
-                        <p className="m-0 p-0 h5"><b>Titulo</b></p>
-                        <p className="m-0 p-0">mas informacion sobre la alerta</p>
+                {(thread) &&
+                    <div>
+                        <div className="row">
+                            <div className="col-2 offset-10 text-right">
+                                <Button size="small" type="link" icon="close-circle" />
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="col-12 text-center">
+                                <p className="m-0 p-0 h6"><b>{thread.name}</b></p>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="col-12">
+                                <Progress percent={thread.percentage} />
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="col-2 offset-10 mt-2">
+                                <Button type="primary" size="small" onClick={() => this.setState({ /*notification: false,*/ modal_lote: true })}>
+                                    Abrir
+                                </Button>
+                            </div>
+                        </div>
                     </div>
-                    <div className="col-2 text-right">
-                        <Button size="small" type="link" icon="close-circle" onClick={() => this.setState({ notification: false })} />
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col-12">
-                        <Progress percent={percent} />
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col-2 offset-10 mt-2">
-                        <Button type="primary" size="small" onClick={() => this.setState({ notification: false, modal_lote: true })}>
-                            Abrir
-                        </Button>
-                    </div>
-                </div>
+                }
             </div>
         );
     }
 
+    handleGetLotes() {
+        const { user } = this.state;
+        this.props.dispatch(mailActionts.getThreads({ id_usuario: user.id_usuario }));
+        this.setState({ modal_lote: true, notification: false })
+    }
+
     handleModalLotes() {
-        const { modal_lote, percent } = this.state;
+        const { modal_lote } = this.state;
+        const { threads } = this.props;
         return (
             <Rodal
                 animation={'slideLeft'}
@@ -255,8 +268,8 @@ class Mail extends Component {
                 closeMaskOnClick
                 showCloseButton={true}
                 customStyles={{ borderRadius: 10 }}
-                width={(window.innerWidth < 600 || window.innerHeight < 550 ? window.innerWidth : 600)}
-                height={(window.innerWidth < 600 || window.innerHeight < 550 ? window.innerHeight : 550)}
+                width={(window.innerWidth < 700 || window.innerHeight < 550 ? window.innerWidth : 700)}
+                height={(window.innerWidth < 700 || window.innerHeight < 550 ? window.innerHeight : 550)}
             >
                 <div>
                     <div className="row">
@@ -266,19 +279,31 @@ class Mail extends Component {
                             </p>
                         </div>
                     </div>
-                    <br />
                     <Divider style={{ backgroundColor: '#4caf50' }} />
-                    <div className="row">
-                        <div className="col-4 mt-1">
-                            <p className="m-0 p-0 h6"><b>Nombre</b></p>
-                        </div>
-                        <div className="col-2">
-                            <Button type="dashed" icon="play-circle" size="small" />
-                            <Button type="dashed" icon="pause" className="ml-1" size="small" />
-                        </div>
-                        <div className="col-6">
-                            <Progress percent={percent} />
-                        </div>
+
+                    <div style={{ width: '100%', height: window.innerHeight < 550 ? (window.innerHeight - 300) : 500, overflowY: 'auto', overflowX: 'hidden'}}>
+                        {threads && threads.map((item, i) => {
+                            return (
+                                <div className="row row-thread" key={i}>
+                                    <div className="col-6 mt-1 text-center">
+                                        <p className="m-0 p-0 h6">{item.name}</p>
+                                        <p className="m-0 p-0">{item.fecha_creacion}</p>
+                                    </div>                                
+                                    <div className="col-4">
+                                        <Progress percent={item.percentage} />
+                                    </div>
+                                    <div className="col-2">
+                                        <Button 
+                                            type="link" 
+                                            icon="redo" 
+                                            className="ml-1" 
+                                            size="small" 
+                                            icon={(item.send == item.length) ? 'redo' : ((item.status == 1) ? 'play-circle' : 'pause-circle')}
+                                        />
+                                    </div>
+                                </div>
+                            )
+                        })}
                     </div>
                 </div>
             </Rodal>
@@ -288,9 +313,9 @@ class Mail extends Component {
 
 function mapsStateToProps(state) {
     const { _mails, _clients } = state;
-    const { mails, lote } = _mails;
+    const { mails, notification, lote, thread, threads } = _mails;
     const { clientes_activos, productos_cliente, textos_cliente } = _clients;
-    return { mails, lote, clientes_activos, productos_cliente, textos_cliente };
+    return { mails, lote, clientes_activos, productos_cliente, textos_cliente, notification, thread, threads };
 }
 
 export default connect(mapsStateToProps)(Mail);

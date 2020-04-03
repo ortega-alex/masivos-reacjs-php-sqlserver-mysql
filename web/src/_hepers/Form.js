@@ -217,9 +217,9 @@ class Form extends Component {
             if (!err) {
                 const { no_reset } = this.props;
                 this.props.handleSubmit(values);
-                if (!no_reset) {
-                    this.props.form.resetFields();
-                }
+                // if (!no_reset) {
+                //     this.props.form.resetFields();
+                // }
             }
         });
     }
