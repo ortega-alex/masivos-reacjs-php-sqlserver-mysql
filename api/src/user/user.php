@@ -40,7 +40,7 @@ if (isset($_GET['login'])) {
             $res['err'] = "false";
             $res['user'] = $user;
         } else {
-            $res['msj'] = "_contraseña incorrecta";
+            $res['msj'] = "contraseña incorrecta";
         }
     } else {
         $res['msj'] = "Usuario incorrecto";

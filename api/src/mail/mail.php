@@ -22,7 +22,6 @@ $dtDateEnd = isset($_POST['date_end']) ? date('Y-m-d H:m:s', strtotime($_POST['d
 $objThread = isset($_POST['thread']) ? json_decode($_POST['thread']) : null;
 $arrLote = isset($_POST['lote']) ? json_decode($_POST['lote']) : null;
 
-$strNombre = isset($_POST['nombre']) ? trim($_POST['nombre']) : '';
 $intIdCliente = isset($_POST['id_cliente']) ? intval($_POST['id_cliente']) : 0;
 $intIdProducto = isset($_POST['id_producto']) ? intval($_POST['id_producto']) : 0;
 $intIdTexto = isset($_POST['id_texto']) ? intval($_POST['id_texto']) : 0;
@@ -64,6 +63,18 @@ if (isset($_GET['get'])) {
 
 if (isset($_GET['lot'])) {
     // if ($intIdThread <= 0) {
+    //     $strQuery = "   SELECT a.nombre, b.descripcion AS produto, c.descripcion  AS texto
+    //                     FROM oca_sac.dbo.clientes a
+    //                     INNER JOIN oca_sac.dbo.productos b ON a.id_cliente = b.id_cliente
+    //                     INNER JOIN masivos.dbo.correos_textos c ON a.id_cliente = c.id_cliente
+    //                     WHERE a.id_cliente = {$intIdCliente}
+    //                     AND b.id_producto = {$intIdProducto}
+    //                     AND c.Id_texto = {$intIdTexto}";
+    //     $qTmp = $_con->db_consulta($strQuery);
+    //     $rTmp = $_con->db_fetch_assoc($qTmp);
+    //     $strNombre = $rTmp['nombre'] . "/" . $rTmp['produto'] . "/" . $rTmp['texto'];
+
+        
     //     $strQuery = "   INSERT INTO masivos.dbo.thread (id_usuario, id_cliente, id_producto, id_texto, name, send, percentage, length)
     //                     VALUES ({$intIdUsuario}, {$intIdCliente}, {$intIdProducto}, {$intIdTexto}, '{$strNombre}', 0, 0, 0)";
     //     if ($_con->db_consulta($strQuery)) {
@@ -72,6 +83,13 @@ if (isset($_GET['lot'])) {
     //         $rTmp = $_con->db_fetch_assoc($qTmp);
     //         $intIdThread = $rTmp['id'];
     //     }
+    // } else {
+    //     $strQuery = "   UPDATE masivos.dbo.thread 
+    //                     SET send = 0,
+    //                         percentage = 0,
+    //                         status = 0
+    //                     WHERE id_thread = {$intIdThread}";
+    //     $_con->db_consulta($strQuery);
     // }
 
     // $strQuery = "   SELECT a.id_remesa, b.no_linea, b.control
@@ -155,12 +173,12 @@ if (isset($_GET['lot'])) {
         );
         $count++;
     }
-
-    // $arr = array();
-    // $arr[0][0] = "m.ortega@ocacall.oca";
-    // $arr[0][1] = "mortegalex27@gmail.com";
-    // $arr[0][2] = "ortegalexbleach@gmail.com";
-    // $arr[0][3] = "mortegalex27@outlook.es";
+    
+    $_length = sizeof($arr);
+    $strQuery = "   UPDATE masivos.dbo.thread 
+                    SET [length] = {$_length}
+                    WHERE id_thread = {$intIdThread}";
+    $_con->db_consulta($strQuery);
 
     $strQuery = "   SELECT a.id_thread, a.name, a.send, a.percentage, status,
                         b.Id_texto , b.subject, b.body, b.sender
@@ -179,7 +197,7 @@ if (isset($_GET['lot'])) {
         'sender' => $rTmp['sender'],
         'send' => $rTmp['send'],
         'percentage' => $rTmp['percentage'],
-        'length' => sizeof($arr),
+        'length' => $_length,
         'status' => $rTmp['status'],
     );
     $res['lote'] = $arr;
@@ -187,32 +205,6 @@ if (isset($_GET['lot'])) {
 }
 
 if (isset($_GET['send'])) {
-    $fecha = date('Y-m-d H:m:s');
-    foreach ($arrLote as $key => &$value) {
-        $strQuery = "   UPDATE masivos.dbo.outbound_correos
-                        SET enviado = 1,
-                            procesado = 1,
-                            fecha_envio = '{$fecha}'
-                        WHERE Id_outbound_correos = {$value->Id_outbound_correos}";
-        $_con->db_consulta($strQuery);
-    }
-
-    $objThread->send = $objThread->send + 1;
-    $objThread->percentage = intval(round(($objThread->send / $objThread->length) * 100));
-
-    if ($objThread->send == $objThread->length) {
-        $objThread->status = 1;
-    }
-
-    $strQuery = "   UPDATE masivos.dbo.thread
-                        SET status = {$objThread->status},
-                            percentage = {$objThread->percentage},
-                            send = {$objThread->send},
-                            [length] = {$objThread->length}
-                        WHERE id_thread = {$objThread->id_thread}";
-    $_con->db_consulta($strQuery);
-
-    $res['thread'] = $objThread;
 
     // try {
     //     $mail = new PHPMailer();
@@ -232,21 +224,36 @@ if (isset($_GET['send'])) {
 
     //     $mail->Body = $objThread->body; // mensaje
 
-    //     foreach ($arrLote as $key => &$_mail) {
-    //         $mail->AddAddress($_mail); // Esta es la dirección a donde enviamos
+    $fecha = date('Y-m-d H:m:s');
+    foreach ($arrLote as $key => &$value) {
+        $strQuery = "   UPDATE masivos.dbo.outbound_correos
+                                SET enviado = 1,
+                                    procesado = 1,
+                                    fecha_envio = '{$fecha}'
+                                WHERE Id_outbound_correos = {$value->Id_outbound_correos}";
+        $_con->db_consulta($strQuery);
+        //         $mail->CharSet = 'UTF-8';
+        //         $exito = $mail->Send(); //Envía el correo.
 
-    //         $mail->CharSet = 'UTF-8';
-    //         $exito = $mail->Send(); //Envía el correo.
+        //         if ($exito) {
+        //             $mail->clearAddresses();
+        //         }
+    }
 
-    //         if ($exito) {
-    //             $mail->clearAddresses();
-    //         }
-    //     }
+    $objThread->send = $objThread->send + 1;
+    $objThread->percentage = intval(round(($objThread->send / $objThread->length) * 100));
+    if ($objThread->send == $objThread->length) {
+        $objThread->status = 1;
+    }
 
-    //     $objThread->send = $objThread->send + 1;
-    //     $objThread->percentage = (($objThread->send / $objThread->length) * 100);
-
-    //     $res['thread'] = $objThread;
+    $strQuery = "   UPDATE masivos.dbo.thread
+                                SET status = {$objThread->status},
+                                    percentage = {$objThread->percentage},
+                                    send = {$objThread->send},
+                                    [length] = {$objThread->length}
+                                WHERE id_thread = {$objThread->id_thread}";
+    $_con->db_consulta($strQuery);
+    $res['thread'] = $objThread;
 
     // } catch (Exception $e) {
     //     print(json_encode('Excepción capturada: ' . $e->getMessage()));

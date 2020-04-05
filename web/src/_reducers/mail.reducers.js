@@ -5,8 +5,7 @@ export default function _mails(state = {}, action) {
     switch (action.type) {
         case MailConstants.REQUEST_MAIL:
             return {
-                ...state,
-                notification: action.notification
+                ...state
             };
         case MailConstants.FAILURE_MAIL:
             Functions.message("error", action.err.toString());
@@ -23,16 +22,21 @@ export default function _mails(state = {}, action) {
                 ...state,
                 mails: action.mails
             };
-        case MailConstants.GET_LOT:
+        case MailConstants.GET_NOTIFICATIONS_THREAD:
             return {
                 ...state,
-                lote: action.data.lote,
-                thread: action.data.thread
+                notifications_thread: action.notifications_thread,
+                notification: action.notification
             };
         case MailConstants.GET_THREADS:
             return {
                 ...state,
                 threads: action.threads
+            };
+        case MailConstants.OPEN_OR_CLOSE_PANEL:
+            return {
+                ...state,
+                modal_panel: action.modal_panel
             };
         default:
             return state

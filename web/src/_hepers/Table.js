@@ -16,7 +16,7 @@ class Table extends Component {
         return (
             <div className="row">
                 <div
-                    className='ag-theme-balham' style={{ width: '100%', height: height ? height : '75vh' }}
+                    className='ag-theme-balham' style={{ width: '100%', height: height ? height : '70vh' }}
                 >
                     <AgGridReact
                         floatingFilter={true}

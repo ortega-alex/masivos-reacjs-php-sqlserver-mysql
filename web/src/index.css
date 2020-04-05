@@ -95,14 +95,17 @@ code {
     padding: 2%;
 }
 
-.notificaion {
+.notificaions {
     position: absolute;
     width: 400px;
+    bottom: 10px;
+    right: 20px;
+    z-index: 3000;   
+}
+
+.notification {
     background-color:#fb8c00;
     padding: 10px;
-    bottom: 0px;
-    right: 20px;
-    z-index: 3000;
     border-radius: 5px;
     box-shadow: 0px 5px 10px #909497;
 }

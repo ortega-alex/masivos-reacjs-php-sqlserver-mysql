@@ -22,7 +22,8 @@ function commaSeparateNumber(val) {
 
 function message(typo, menssage) {
     Message.config({
-        top: 50
+        top: 50,
+        duration: 5
     });
     Message[typo](menssage);
 }

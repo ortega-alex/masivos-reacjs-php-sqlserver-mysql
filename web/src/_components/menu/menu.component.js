@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { HashRouter, Route, Link } from 'react-router-dom';
 import { Menu as MenuAntd, Icon } from 'antd';
 import { AsyncStorage } from 'AsyncStorage';
@@ -6,6 +7,8 @@ import { AsyncStorage } from 'AsyncStorage';
 import UserActions from "../../_actionts/user.actionts";
 import Message from "../message/message.component";
 import Mail from "../mail/mail.component";
+import Notification from "../../_hepers/Notification";
+import mailActionts from '../../_actionts/mail.actionts';
 
 const { Item, SubMenu } = MenuAntd;
 
@@ -32,8 +35,12 @@ class Menu extends Component {
 
     render() {
         const { pathname, user, color } = this.state;
+        const { notification } = this.props;
         return (
             <HashRouter>
+                {notification &&
+                    this.handleNotificacion()
+                }
                 <MenuAntd
                     mode="horizontal"
                     defaultSelectedKeys={[pathname]}
@@ -89,6 +96,40 @@ class Menu extends Component {
     cerrarSession() {
         this.props.dispatch(UserActions.logout());
     }
+
+    handleNotificacion() {
+        const { notifications_thread } = this.props
+        return (
+            <div className="notificaions">
+                { notifications_thread && Object.keys(notifications_thread).map((item, i) => {
+                    return (
+                        <Notification
+                            key={i}
+                            thread={notifications_thread[item]}
+                            handleClose={this.handleClose.bind(this)}
+                            handleOpen={this.handleOpen.bind(this)}
+                        />
+                    )
+                })}
+            </div>
+        );
+    }
+
+    handleClose(id_thread) {
+        this.props.dispatch(mailActionts.removeNotificationThread(id_thread));
+    }
+
+    handleOpen(id_thread) {
+        const { user } = this.state;
+        this.props.dispatch(mailActionts.removeNotificationThread(id_thread));
+        this.props.dispatch(mailActionts.OpenOrClosePanel(true, user.id_usuario));
+    }
 }
 
-export default Menu;
+function mapsProsToState(state) {
+    const { _mails } = state;
+    const { notification, notifications_thread } = _mails;
+    return { notification, notifications_thread };
+}
+
+export default connect(mapsProsToState)(Menu);
