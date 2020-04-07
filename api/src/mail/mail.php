@@ -34,10 +34,10 @@ if (isset($_GET['get'])) {
                     b.id_texto, b.descripcion,
                     c.id_usuario, c.login AS usuario,
                     d.nombre AS cliente
-                FROM masivos..outbound_correos a
-                INNER JOIN masivos..correos_textos b ON a.id_texto = b.Id_texto
-                INNER JOIN oca_sac..usuarios c ON a.id_usuario_envia = c.id_usuario
-                INNER JOIN oca_sac..clientes d ON b.id_cliente  = d.id_cliente
+                FROM masivos.dbo.outbound_correos a
+                INNER JOIN masivos.dbo.correos_textos b ON a.id_texto = b.Id_texto
+                INNER JOIN oca_sac.dbo.usuarios c ON a.id_usuario_envia = c.id_usuario
+                INNER JOIN oca_sac.dbo.clientes d ON b.id_cliente  = d.id_cliente
                 WHERE a.fecha_creacion BETWEEN '{$dtDateStart}' AND '{$dtDateEnd}'
                 ORDER BY a.fecha_envio, a.email, c.login";
     $qTmp = $_con->db_consulta($strQuery);
@@ -74,7 +74,6 @@ if (isset($_GET['lot'])) {
     //     $rTmp = $_con->db_fetch_assoc($qTmp);
     //     $strNombre = $rTmp['nombre'] . "/" . $rTmp['produto'] . "/" . $rTmp['texto'];
 
-        
     //     $strQuery = "   INSERT INTO masivos.dbo.thread (id_usuario, id_cliente, id_producto, id_texto, name, send, percentage, length)
     //                     VALUES ({$intIdUsuario}, {$intIdCliente}, {$intIdProducto}, {$intIdTexto}, '{$strNombre}', 0, 0, 0)";
     //     if ($_con->db_consulta($strQuery)) {
@@ -84,7 +83,7 @@ if (isset($_GET['lot'])) {
     //         $intIdThread = $rTmp['id'];
     //     }
     // } else {
-    //     $strQuery = "   UPDATE masivos.dbo.thread 
+    //     $strQuery = "   UPDATE masivos.dbo.thread
     //                     SET send = 0,
     //                         percentage = 0,
     //                         status = 0
@@ -145,40 +144,63 @@ if (isset($_GET['lot'])) {
     //     $qTmp = $_con->db_consulta($strQuery);
     // }
 
-    $strQuery = "   SELECT a.Id_outbound_correos, a.email,
-                        b.control, b.no_cuenta, b.nombre_completo AS nombre, b.direccion
-                    FROM masivos.dbo.outbound_correos a
-                    INNER JOIN oca_sac.dbo.remesas_cuentas b ON a.control = b.control
-                    WHERE a.enviado = 0
-                    AND a.id_thread = {$intIdThread}";
+    // $strQuery = "   SELECT a.Id_outbound_correos, a.email,
+    //                     b.control, b.no_cuenta, b.nombre_completo AS nombre, b.direccion
+    //                 FROM masivos.dbo.outbound_correos a
+    //                 INNER JOIN oca_sac.dbo.remesas_cuentas b ON a.control = b.control
+    //                 WHERE a.enviado = 0
+    //                 AND a.id_thread = {$intIdThread}";
 
-    $qTmp = $_con->db_consulta($strQuery);
+    // $qTmp = $_con->db_consulta($strQuery);
 
-    $arr = array();
-    $index = 0;
-    $count = 0;
-    while ($rTmp = $_con->db_fetch_object($qTmp)) {
+    // $arr = array();
+    // $index = 0;
+    // $count = 0;
+    // while ($rTmp = $_con->db_fetch_object($qTmp)) {
 
-        if ($count >= 100) {
-            $index++;
-            $count = 0;
-        }
+    //     if ($count >= 100) {
+    //         $index++;
+    //         $count = 0;
+    //     }
 
-        $arr[$index][] = array(
-            'Id_outbound_correos' => $rTmp->Id_outbound_correos,
-            'email' => $rTmp->email,
-            'control' => $rTmp->control,
-            'nombre' => $rTmp->nombre,
-            'direccion' => $rTmp->direccion,
-        );
-        $count++;
-    }
-    
-    $_length = sizeof($arr);
-    $strQuery = "   UPDATE masivos.dbo.thread 
-                    SET [length] = {$_length}
-                    WHERE id_thread = {$intIdThread}";
-    $_con->db_consulta($strQuery);
+    //     $arr[$index][] = array(
+    //         'Id_outbound_correos' => $rTmp->Id_outbound_correos,
+    //         'email' => $rTmp->email,
+    //         'control' => $rTmp->control,
+    //         'nombre' => $rTmp->nombre,
+    //         'direccion' => $rTmp->direccion,
+    //     );
+    //     $count++;
+    // }
+
+    // $_length = sizeof($arr);
+    // $strQuery = "   UPDATE masivos.dbo.thread
+    //                 SET [length] = {$_length}
+    //                 WHERE id_thread = {$intIdThread}";
+    // $_con->db_consulta($strQuery);
+
+    $arr[0][] = array(
+        'Id_outbound_correos' => 1,
+        'email' => 'mortegalex27@gmail.com',
+        'cuenta' => '192.168.1.1',
+        'nombre' => 'Alex Ortega',
+        'direccion' => 'Zona 18',
+    );
+    $arr[1][] = array(
+        'Id_outbound_correos' => 1,
+        'email' => 'mortegalex27@outlook.es',
+        'cuenta' => '192.168.1.2',
+        'nombre' => 'Marlon Ortega',
+        'direccion' => 'Zona 18',
+    );
+    $arr[2][] = array(
+        'Id_outbound_correos' => 1,
+        'email' => 'm.ortega@ocacall.com',
+        'cuenta' => '192.168.1.3',
+        'nombre' => 'Alexander Revolorio',
+        'direccion' => 'Zona 18',
+    );
+    $_length = 3;
 
     $strQuery = "   SELECT a.id_thread, a.name, a.send, a.percentage, status,
                         b.Id_texto , b.subject, b.body, b.sender
@@ -206,58 +228,65 @@ if (isset($_GET['lot'])) {
 
 if (isset($_GET['send'])) {
 
-    // try {
-    //     $mail = new PHPMailer();
-    //     $mail->IsSMTP();
-    //     $mail->SMTPSecure = "ssl";
-    //     $mail->SMTPAuth = true;
+    try {
+        $mail = new PHPMailer();
+        $mail->IsSMTP();
+        $mail->SMTPSecure = "ssl";
+        $mail->SMTPAuth = true;
 
-    //     $mail->Host = "mail.ocacall.com"; // SMTP a utilizar. Por ej. smtp.elserver.com
-    //     $mail->Username = "helpdesk@ocacall.com"; // Correo completo a utilizar
-    //     $mail->Password = "Ge@FAG8C8km-QC9fNAb9x@XT5b!ytHRk3nK7FN4hq=9dQ"; // Contraseña
+        $mail->Host = "mail.ocacall.com"; // SMTP a utilizar. Por ej. smtp.elserver.com
+        $mail->Username = "helpdesk@ocacall.com"; // Correo completo a utilizar
+        $mail->Password = "Ge@FAG8C8km-QC9fNAb9x@XT5b!ytHRk3nK7FN4hq=9dQ"; // Contraseña
 
-    //     $mail->Port = 465; // Puerto a utilizar
-    //     $mail->From = $objThread->sender; // Desde donde enviamos (Para mostrar)
-    //     $mail->FromName = "OCA"; //$strTitle;
-    //     $mail->Subject = $objThread->subject; // Este es el titulo del email.
-    //     $mail->IsHTML(true); // El correo se envía como HTML
+        $mail->Port = 465; // Puerto a utilizar
+        $mail->From = $objThread->sender; // Desde donde enviamos (Para mostrar)
+        $mail->FromName = "OCA"; //$strTitle;
+        $mail->Subject = $objThread->subject; // Este es el titulo del email.
+        $mail->IsHTML(true); // El correo se envía como HTML
 
-    //     $mail->Body = $objThread->body; // mensaje
+        $arr_temp = array(
+            '$cuenta', '$nombre', '$direccion', '$fecha',
+        );
+        $_fecha = ' ' . date('d') . ' DE ' . nameMonth(date('n')) . ' DE ' . date('Y');
+        foreach ($arrLote as $key => &$value) {
+            $_arr = array($value->cuenta, $value->nombre, $value->direccion, $_fecha);
 
-    $fecha = date('Y-m-d H:m:s');
-    foreach ($arrLote as $key => &$value) {
-        $strQuery = "   UPDATE masivos.dbo.outbound_correos
-                                SET enviado = 1,
-                                    procesado = 1,
-                                    fecha_envio = '{$fecha}'
-                                WHERE Id_outbound_correos = {$value->Id_outbound_correos}";
-        $_con->db_consulta($strQuery);
-        //         $mail->CharSet = 'UTF-8';
-        //         $exito = $mail->Send(); //Envía el correo.
+            $_body = str_replace($arr_temp, $_arr, $objThread->body);
+            $mail->Body = $_body . "<br/><br/><img src='http://168.234.50.2:8080/dev/masivo/api/public/img/ocaicon.png'/>";
 
-        //         if ($exito) {
-        //             $mail->clearAddresses();
-        //         }
+            $mail->AddAddress("{$value->email}");
+            // $strQuery = "   UPDATE masivos.dbo.outbound_correos
+            //                 SET enviado = 1,
+            //                     procesado = 1,
+            //                     fecha_envio = '{$fecha}'
+            //                 WHERE Id_outbound_correos = {$value->Id_outbound_correos}";
+            // $_con->db_consulta($strQuery);
+
+            $mail->CharSet = 'UTF-8';
+            $exito = $mail->Send(); //Envía el correo.
+
+            if ($exito) {
+                $mail->clearAddresses();
+            }
+        }
+
+        $objThread->send = $objThread->send + 1;
+        $objThread->percentage = intval(round(($objThread->send / $objThread->length) * 100));
+        if ($objThread->send == $objThread->length) {
+            $objThread->status = 1;
+        }
+
+        // $strQuery = "   UPDATE masivos.dbo.thread
+        //                 SET status = {$objThread->status},
+        //                     percentage = {$objThread->percentage},
+        //                     send = {$objThread->send},
+        //                     [length] = {$objThread->length}
+        //                 WHERE id_thread = {$objThread->id_thread}";
+        // $_con->db_consulta($strQuery);
+        $res['thread'] = $objThread;
+    } catch (Exception $e) {
+        print(json_encode('Excepción capturada: ' . $e->getMessage()));
     }
-
-    $objThread->send = $objThread->send + 1;
-    $objThread->percentage = intval(round(($objThread->send / $objThread->length) * 100));
-    if ($objThread->send == $objThread->length) {
-        $objThread->status = 1;
-    }
-
-    $strQuery = "   UPDATE masivos.dbo.thread
-                                SET status = {$objThread->status},
-                                    percentage = {$objThread->percentage},
-                                    send = {$objThread->send},
-                                    [length] = {$objThread->length}
-                                WHERE id_thread = {$objThread->id_thread}";
-    $_con->db_consulta($strQuery);
-    $res['thread'] = $objThread;
-
-    // } catch (Exception $e) {
-    //     print(json_encode('Excepción capturada: ' . $e->getMessage()));
-    // }
 }
 
 if (isset($_GET['get_threads'])) {

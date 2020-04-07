@@ -21,3 +21,22 @@ function encryptPassword($pass)
     }
     return $val;
 }
+
+function nameMonth($n)
+{
+    $arr = array(
+        'ENERO',
+        'FEBRERO',
+        'MARZO',
+        'ABRIL',
+        'MAYO',
+        'JUNIO',
+        'JULIO',
+        'AGOSTO',
+        'SEPTIEMBRE',
+        'OCTUBRE',
+        'NOVIEMBRE',
+        'DICIEMBRE',
+    );
+    return $arr[intval($n) - 1];
+}

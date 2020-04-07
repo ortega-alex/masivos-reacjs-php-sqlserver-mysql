@@ -6,10 +6,11 @@ import Rodal from "rodal";
 import { AsyncStorage } from "AsyncStorage";
 
 import mailActionts from "../../_actionts/mail.actionts";
-import Table from "../../_hepers/Table";
-import Form from "../../_hepers/Form";
+import Table from "../../_helpers/Table";
+import Form from "../../_helpers/Form";
 import clientActionts from "../../_actionts/client.actionts";
-import Functions from "../../_hepers/Functions";
+import Functions from "../../_helpers/Functions";
+import TextEditor from "../../_helpers/TextEditor";
 
 require("moment/min/locales.min");
 moment.locale('es');
@@ -23,13 +24,13 @@ const table = [
     { header: 'Correo', value: 'email', filter: true, type: 1 },
     { header: 'Detalle', value: 'descripcion', filter: true, type: 1 },
     { header: 'Usuario', value: 'usuario', filter: true, type: 1 },
-    { header: 'Enviado', value: 'enviado', filter: true, type: 3 }
+    { header: 'Enviado', value: 'enviado', filter: true, type: 6 }
 ];
 
 const form = [
     { name: 'Cliente', value: 'id_cliente', required: true, type: 7, option: 'clientes_activos', col: 6, change: true },
     { name: 'Producto', value: 'id_producto', required: true, type: 7, option: 'productos_cliente', col: 6 },
-    { name: 'Texto', value: 'id_texto', required: true, type: 7, option: 'textos_cliente' }
+    { name: 'Texto', value: 'id_texto', required: true, type: 7, option: 'textos_cliente', change: true }
 ];
 
 class Mail extends Component {
@@ -41,7 +42,9 @@ class Mail extends Component {
             date_end: moment(),
             modal: false,
             content: undefined,
-            user: undefined
+            user: undefined,
+            body: '',
+            modal_text: false
         };
     }
 
@@ -57,15 +60,18 @@ class Mail extends Component {
     }
 
     render() {
-        const { date_start, date_end, modal } = this.state;
+        const { date_start, date_end, modal, modal_text } = this.state;
         const { mails, modal_panel } = this.props;
         return (
-            <div style={{ position: 'relative' }}>
+            <div style={{ position: 'relative' }}>               
                 {modal &&
                     this.handleModal()
                 }
                 {modal_panel &&
                     this.handleModalLotes()
+                }
+                 {modal_text &&
+                    this.handleModalText()
                 }
                 <div className="row">
                     <div className="col-md-8 offset-md-2 text-center">
@@ -180,7 +186,7 @@ class Mail extends Component {
                     <div className="row">
                         <div className="col-md-2 offset-md-10 text-right">
                             <Tooltip title="Permite visualizar el mensaje a enviar">
-                                <Button type="primary" icon="file-search" shape="circle" />
+                                <Button type="primary" icon="file-search" shape="circle" onClick={() => this.setState({ modal_text: true })} />
                             </Tooltip>
                         </div>
                     </div>
@@ -202,14 +208,23 @@ class Mail extends Component {
         this.setState({ modal: false });
     }
 
-    handleOptionsChange(value) {
-        this.props.dispatch(clientActionts.getProductoCliente({ 'id_cliente': value }));
-        this.props.dispatch(clientActionts.getTextoCliente({ 'id_cliente': value }));
+    handleOptionsChange(value, res) {
+      console.log(value, res);
+        if (res == 'id_cliente') {
+            this.props.dispatch(clientActionts.getProductoCliente({ 'id_cliente': value }));
+            this.props.dispatch(clientActionts.getTextoCliente({ 'id_cliente': value }));
+        } else {
+            const { textos_cliente } = this.props;
+            var _textos_cliente = textos_cliente.filter(item => {
+                return item.id_texto == value;
+            });
+            console.log(_textos_cliente);
+            this.setState({ body: _textos_cliente[0].body });
+        }
     }
 
     handleGetLotes() {
         const { user } = this.state;
-        // this.props.dispatch(mailActionts.getThreads({ id_usuario: user.id_usuario }));
         this.props.dispatch(mailActionts.OpenOrClosePanel(true, user.id_usuario));
     }
 
@@ -261,6 +276,37 @@ class Mail extends Component {
                             )
                         })}
                     </div>
+                </div>
+            </Rodal>
+        );
+    }
+
+
+    handleModalText() {
+        const { modal_text, body } = this.state;
+        return (
+            <Rodal
+                animation='flip'
+                duration={500}
+                visible={modal_text}
+                onClose={() => this.setState({ modal_text: false })}
+                closeMaskOnClick
+                showCloseButton={true}
+                customStyles={{ borderRadius: 10 }}
+                width={500}
+                height={400}
+            >
+                <div>
+                    <div className="row">
+                        <div className="col-8 offset-2 text-center">
+                            <p className="m-0 p-0 h5">TEXTO A ENVIAR</p>
+                        </div>
+                    </div>
+                    <TextEditor
+                        body={body}
+                        height={350}
+                        disabled={true}
+                    />
                 </div>
             </Rodal>
         );

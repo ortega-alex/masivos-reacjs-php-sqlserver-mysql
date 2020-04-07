@@ -66,6 +66,11 @@ async function validateSession() {
     });
 }
 
+function validEmail(text) {
+    var reg = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/;
+    return reg.test(text);
+}
+
 export default  {
     removeTildes,
     replaceSpaces,
@@ -74,5 +79,6 @@ export default  {
     orderByAsc,
     itHasLetters,
     multiple,
-    validateSession
+    validateSession,
+    validEmail
 };

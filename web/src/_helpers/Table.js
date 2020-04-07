@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Tooltip, Switch, Checkbox } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faLock, faCheck, faFileAlt, faTrash, faCheckDouble, faBan } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faLock, faCheck, faFileAlt, faTrash, faCheckDouble, faBan, faUnlock } from '@fortawesome/free-solid-svg-icons';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 
 import Functions from './Functions';
@@ -34,7 +34,8 @@ class Table extends Component {
                                         : (res.type == 2 ? this.handleMoney(res, i)
                                             : (res.type == 3) ? this.handleStatus(res, i)
                                                 : (res.type == 4) ? this.handleOptios(res, i)
-                                                    : this.handleNumber(res, i))
+                                                    : (res.type == 5) ? this.handleNumber(res, i)
+                                                        : this.handleStatusEmal(res, i))
                                 )
                             })
                         }
@@ -90,6 +91,22 @@ class Table extends Component {
     handleStatus(res, i) {
         return (
             <AgGridColumn key={i} headerName={res.header} field={res.value} width={15} minWidth={100}
+                cellStyle={(param) => ((param.value == 0) ? { color: 'green' } : { color: 'red' })}
+                cellRendererFramework={(param) => {
+                    return (
+                        <div className="text-center">
+                            <FontAwesomeIcon icon={(param.value == 1) ? faUnlock : faLock}/>&nbsp;{(param.value == 0) ? 'Activo' : 'Inactivo'}
+                        </div>
+                    );
+                }}
+            />
+        );
+    }
+
+    
+    handleStatusEmal(res, i) {
+        return (
+            <AgGridColumn key={i} headerName={res.header} field={res.value} width={15} minWidth={100}
                 cellStyle={(param) => ((param.value == 0) ? { color: '#e0e0e0' } : ((param.value) == 1 || (param.value) == 2) ? { color: 'green' } : { color: 'red' })}
                 cellRendererFramework={(param) => {
                     return (
@@ -133,7 +150,7 @@ class Table extends Component {
                                 </button>
                             }
                             {res.status &&
-                                <Switch size="small" defaultChecked={(param.data.estado == "Activo") ? true : false}
+                                <Switch size="small" defaultChecked={(param.data.estado == 0) ? true : false}
                                     onChange={(valor) => this.props.handleEditEstado(valor, param.data)} />
                             }
                             {res.check &&

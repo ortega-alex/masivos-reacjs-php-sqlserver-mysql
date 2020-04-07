@@ -7,8 +7,9 @@ import { AsyncStorage } from 'AsyncStorage';
 import UserActions from "../../_actionts/user.actionts";
 import Message from "../message/message.component";
 import Mail from "../mail/mail.component";
-import Notification from "../../_hepers/Notification";
+import Notification from "../../_helpers/Notification";
 import mailActionts from '../../_actionts/mail.actionts';
+import Body from "../mail/body.component";
 
 const { Item, SubMenu } = MenuAntd;
 
@@ -72,11 +73,19 @@ class Menu extends Component {
                                 <span>Configuracion</span>
                             </span>
                         }
-                        style={{ marginLeft:  window.innerWidth < 500 ? 0 : window.innerWidth - 500 }}
+                        style={{ marginLeft: window.innerWidth < 500 ? 0 : window.innerWidth - 500 }}
                     >
                         <Item disabled="true">
                             <Icon type="user" />
                             <span>{user.nombre}</span>
+                        </Item>
+                        <Item key="/textos">
+                            <Link to="/textos"
+                                onClick={() => { this.setState({ pathname: "/textos" }) }}
+                            >
+                                <Icon type="file-done" />
+                                <span>Textos</span>
+                            </Link>
                         </Item>
                         <Item onClick={this.cerrarSession.bind(this)}>
                             <Icon type="logout" />
@@ -88,6 +97,7 @@ class Menu extends Component {
                 <div className="m-3">
                     <Route path="/" exact component={Mail} />
                     <Route path="/message" component={Message} />
+                    <Route path="/textos" component={Body} />
                 </div>
             </HashRouter>
         );
@@ -101,7 +111,7 @@ class Menu extends Component {
         const { notifications_thread } = this.props
         return (
             <div className="notificaions">
-                { notifications_thread && Object.keys(notifications_thread).map((item, i) => {
+                {notifications_thread && Object.keys(notifications_thread).map((item, i) => {
                     return (
                         <Notification
                             key={i}

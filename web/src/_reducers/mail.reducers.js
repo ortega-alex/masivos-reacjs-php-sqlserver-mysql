@@ -1,5 +1,5 @@
 import { MailConstants } from '../_constants/index';
-import Functions from '../_hepers/Functions';
+import Functions from '../_helpers/Functions';
 
 export default function _mails(state = {}, action) {
     switch (action.type) {

@@ -18,12 +18,12 @@ $strUsuario = isset($_POST['usuario']) ? trim($_POST['usuario']) : '';
 $intPass = isset($_POST['pass']) ? intval(encryptPassword($_POST['pass'])) : 0;
 
 if (isset($_GET['login'])) {
-    $strQuery = "  SELECT id_usuario, nombres, apellidos
+    $strQuery = "  SELECT id_usuario, nombres, apellidos,
                         CASE
                             WHEN password != {$intPass} THEN 0
                             ELSE 1
                         END AS estado
-                    FROM oca_sac..usuarios
+                    FROM oca_sac.dbo.usuarios
                     WHERE login = '$strUsuario'";
 
     $qTmp = $_con->db_consulta($strQuery);

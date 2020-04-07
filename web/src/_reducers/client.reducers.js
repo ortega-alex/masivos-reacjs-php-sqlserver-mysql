@@ -1,5 +1,5 @@
 import { ClientConstants } from '../_constants/index';
-import Functions from '../_hepers/Functions';
+import Functions from '../_helpers/Functions';
 
 export default function _clients(state = {}, action) {
     switch (action.type) {
@@ -17,11 +17,16 @@ export default function _clients(state = {}, action) {
             return {
                 ...state
             };
-        case ClientConstants.GET_CLIENT_ACT:
+        case ClientConstants.GET_CLIENTS:
             return {
                 ...state,
-                clientes_activos: action.clientes_activos
+                clientes: action.clientes
             };
+            case ClientConstants.GET_CLIENT_ACT:
+                return {
+                    ...state,
+                    clientes_activos: action.clientes_activos
+                };
         case ClientConstants.GET_PRODUC_CLIENT:
             return {
                 ...state,
@@ -32,6 +37,11 @@ export default function _clients(state = {}, action) {
                 ...state,
                 textos_cliente: action.textos_cliente
             };
+            case ClientConstants.GET_TEXTS:
+                return {
+                    ...state,
+                    textos: action.textos
+                };
         default:
             return state
     }

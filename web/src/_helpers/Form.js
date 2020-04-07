@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { Form as FromAnd, Input, InputNumber, Icon, Tabs, Switch, DatePicker, Select, Button } from 'antd';
+import { Form as FromAntd, Input, InputNumber, Icon, Tabs, Switch, DatePicker, Select, Button } from 'antd';
 
 var moment = require('moment');
 require("moment/min/locales.min");
 moment.locale('es');
 
 const { TextArea } = Input;
-const { Item } = FromAnd;
+const { Item } = FromAntd;
 const { TabPane } = Tabs;
 const { Option } = Select;
 
@@ -24,7 +24,7 @@ class Form extends Component {
             <div className="h-100">
                 {arr &&
                     <div>
-                        <FromAnd ref={ref => this.formulariote = ref} onSubmit={this.handleSubmit.bind(this)} className="form form-horizontal" className="scroll" >
+                        <FromAntd ref={ref => this.formulariote = ref} onSubmit={this.handleSubmit.bind(this)} className="form form-horizontal" className="scroll" >
                             <div className="row">
                                 {arr.map((res, i) => {
                                     return (
@@ -33,7 +33,7 @@ class Form extends Component {
                                 })
                                 }
                             </div>
-                        </FromAnd>
+                        </FromAntd>
                         {edit &&
                             <div className={footer ? 'footer' : ''}>
                                 <Button type="primary" block onClick={this.handleSubmit.bind(this)} disabled={disabled}>
@@ -49,7 +49,7 @@ class Form extends Component {
                         {tabs.map((tab, i) => {
                             return (
                                 <TabPane tab={tab.name} key={i}>
-                                    <FromAnd ref={ref => this.formulariote = ref} onSubmit={this.handleSubmit.bind(this)} className="form form-horizontal">
+                                    <FromAntd ref={ref => this.formulariote = ref} onSubmit={this.handleSubmit.bind(this)} className="form form-horizontal">
                                         <div className="row">
                                             {tab.formulario.map((res, j) => {
                                                 return (
@@ -64,7 +64,7 @@ class Form extends Component {
                                                 </Button>
                                             </div>
                                         }
-                                    </FromAnd>
+                                    </FromAntd>
                                 </TabPane>
                             )
                         })}
@@ -185,7 +185,7 @@ class Form extends Component {
 
     handleSelect(res) {
         const { options } = this.props;
-        var condicion = (!res.limpiar) ? '' : null;
+        // var condicion = (!res.limpiar) ? '' : null;
         return (
             <Select
                 className="inp"
@@ -197,13 +197,13 @@ class Form extends Component {
                 disabled={res.disabled}
                 onChange={(value) => {
                     if (res.change) {
-                        this.props.optionsChange(value);
+                        this.props.optionsChange(value, res.value);
                     }
                 }}
             >
                 {(options && options[res.option]) &&
                     options[res.option].map((item, i) => (
-                        (item[res.value] != condicion) &&
+                        (item[res.value] != '' && item[res.value] != null) &&
                         <Option key={i} value={item[res.value]}>{item.nombre}</Option>
                     ))
                 }
@@ -225,4 +225,4 @@ class Form extends Component {
     }
 }
 
-export default FromAnd.create()(Form);
+export default FromAntd.create()(Form);

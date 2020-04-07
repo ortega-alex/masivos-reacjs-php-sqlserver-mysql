@@ -5,7 +5,7 @@ import { Provider } from "react-redux";
 import store from "./Store";
 import Login from "./user/login.component";
 import Menu from "./menu/menu.component";
-import Loading from "../_hepers/Loading";
+import Loading from "../_helpers/Loading";
 
 const _fondo = require('../_media/fondo.jpg');
 
