@@ -43,12 +43,12 @@ function nameMonth($n)
 
 function insertManagement($arr, $_con)
 {
-    $_management = mb_convert_encoding($arr['gestion'], "UTF-8");
+    $_management = utf8_decode($arr['gestion']);
     $_year = date('Y');
     $_month = date('m');
     $_day = date('d');
     $_time = date('H');
-    $_telefono = "Información";
+    $_telefono = utf8_decode("Información");
     $strQuery = "	INSERT INTO oca_sac.dbo.gestion (id_remesa, no_linea, id_usuario, id_gestion_clave, observaciones,
                                                     fecha_inicio, fecha_fin, telefono, descripcion_telefono, fecha_seguimiento,
                                                     fecha_pago, monto, automatico, monto_2, confirmacion,

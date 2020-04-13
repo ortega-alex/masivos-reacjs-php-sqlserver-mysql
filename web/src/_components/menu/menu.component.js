@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { HashRouter, Route, Link } from 'react-router-dom';
-import { Menu as MenuAntd, Icon } from 'antd';
+import { Menu as MenuAntd, Icon, Button } from 'antd';
 import { AsyncStorage } from 'AsyncStorage';
 
 import UserActions from "../../_actionts/user.actionts";
@@ -40,7 +40,7 @@ class Menu extends Component {
         const { notification } = this.props;
         return (
             <HashRouter>
-                {(notification && pathname != '/' ) &&
+                {(notification && pathname != '/') &&
                     this.handleNotificacion()
                 }
                 <MenuAntd
@@ -127,7 +127,7 @@ class Menu extends Component {
                             key={i}
                             thread={notifications_thread[item]}
                             handleClose={this.handleClose.bind(this)}
-                            handleOpen={this.handleOpen.bind(this)}
+                            handleOpen={this.handleLink.bind(this)}
                         />
                     )
                 })}
@@ -139,10 +139,19 @@ class Menu extends Component {
         this.props.dispatch(mailActionts.removeNotificationThread(id_thread));
     }
 
-    handleOpen(id_thread) {
-        const { user } = this.state;
-        this.props.dispatch(mailActionts.removeNotificationThread(id_thread));
-        this.props.dispatch(mailActionts.OpenOrClosePanel(true, user.id_usuario));
+    handleLink(id_thread) {
+        return (
+            <Link to="/"
+                onClick={() => {
+                    this.setState({ pathname: "/" });
+                    this.props.dispatch(mailActionts.removeNotificationThread(id_thread));
+                }}
+            >
+                <Button type="primary" size="small" icon="mail">
+                    <span>ABRIR</span>
+                </Button>
+            </Link>
+        );
     }
 }
 

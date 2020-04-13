@@ -95,7 +95,7 @@ class Table extends Component {
                 cellRendererFramework={(param) => {
                     return (
                         <div className="text-center">
-                            <FontAwesomeIcon icon={(param.value == 1) ? faUnlock : faLock}/>&nbsp;{(param.value == 0) ? 'Activo' : 'Inactivo'}
+                            <FontAwesomeIcon icon={(param.value == 1) ? faUnlock : faLock} />&nbsp;{(param.value == 0) ? 'Activo' : 'Inactivo'}
                         </div>
                     );
                 }}
@@ -103,7 +103,7 @@ class Table extends Component {
         );
     }
 
-    
+
     handleStatusEmal(res, i) {
         return (
             <AgGridColumn key={i} headerName={res.header} field={res.value} width={15} minWidth={100}

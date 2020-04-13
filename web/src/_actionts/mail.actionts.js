@@ -15,7 +15,6 @@ function succes(msj, tipo) { return { type: MailConstants.SUCCESS_MAIL, msj, tip
 function getSucess(mails) { return { type: MailConstants.GET_MAIL, mails } }
 function getNotificationsThreadSuccess(notifications_thread, notification) { return { type: MailConstants.GET_NOTIFICATIONS_THREAD, notifications_thread, notification } }
 function getThreadsSuccess(threads) { return { type: MailConstants.GET_THREADS, threads } }
-function openOrClosePanelSuccess(modal_panel) { return { type: MailConstants.OPEN_OR_CLOSE_PANEL, modal_panel } }
 
 function get(data) {
     return dispatch => {
@@ -32,7 +31,7 @@ function addLot(data) {
     return dispatch => {
         dispatch(request(true));
         http._POST("mail/mail.php?add_lot=true", data).then(res => {
-             AsyncStorage.setItem(res.thread.id_thread, JSON.stringify(res)).then(() => {
+            AsyncStorage.setItem(res.thread.id_thread, JSON.stringify(res)).then(() => {
                 dispatch(request(false));
                 dispatch(getThreads(data));
                 dispatch(sendLot(res.thread));
@@ -72,7 +71,7 @@ function sendLot(thread) {
 function send(data) {
     return dispatch => {
         http._POST("mail/mail.php?send=true", data).then(res => {
-            if ( res.pausar == 'false') {
+            if (res.pausar == 'false') {
                 AsyncStorage.getItem(res.thread.id_thread, (err, _res) => {
                     var data = JSON.parse(_res);
                     data.thread = res.thread;
@@ -80,7 +79,7 @@ function send(data) {
                         dispatch(sendLot(res.thread));
                     });
                 });
-            } 
+            }
         }).catch(err => {
             dispatch(failure(err.toString()));
         });
@@ -134,15 +133,6 @@ function removeNotificationThread(id_thread) {
     }
 }
 
-function OpenOrClosePanel(modal_panel, id_usuario = null) {
-    return dispatch => {
-        if (modal_panel == true) {
-            dispatch(getThreads({ id_usuario }));
-        }
-        dispatch(openOrClosePanelSuccess(modal_panel));
-    }
-}
-
 
 function changeStatusThread(data) {
     return dispatch => {
@@ -167,6 +157,5 @@ export default {
     addLot,
     getThreads,
     removeNotificationThread,
-    OpenOrClosePanel,
     changeStatusThread
 };

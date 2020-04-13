@@ -1,15 +1,10 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Tooltip, Select, Button, Switch, Upload, Icon } from "antd";
-import Rodal from "rodal";
+import { Tooltip, Button, Upload, Icon } from "antd";
 
 import clientActionts from "../../_actionts/client.actionts";
 import Table from "../../_helpers/Table";
-import Form from "../../_helpers/Form";
-import TextEditor from "../../_helpers/TextEditor";
-import Functions from "../../_helpers/Functions";
 
-const { Option } = Select;
 const table = [
     { header: 'Fecha', value: 'fecha', filter: true, type: 1 },
     { header: 'Titulo', value: 'title', filter: true, type: 1 },
@@ -35,7 +30,7 @@ class Image extends Component {
     }
 
     render() {
-        const { modal, uploading } = this.state;
+        const { uploading } = this.state;
         const { images } = this.props;
         const propsUpload = {
             disabled: uploading,
@@ -47,7 +42,7 @@ class Image extends Component {
             multiple: false,
             customRequest: ({ onSuccess, onError, file }) => {
                 this.setState({ subiendo: true, file });
-                this.props.dispatch(clientActionts.addImage({file}));
+                this.props.dispatch(clientActionts.addImage({ file }));
             },
             accept: ".jpg",
             listType: "picture",
@@ -56,11 +51,10 @@ class Image extends Component {
 
         return (
             <div>
-
                 <dv className="row">
                     <div className="col-md-8 offset-md-2 text-center">
                         <p className="m-0 p-0 h3">IMAGENES PARA CORREOS ELECTRONICOS</p>
-                        <p className="m-0 p-0">informacion adicional que describe accion</p>
+                        <p className="m-0 p-0">Permite administrar diferentes plantillas de imágenes para configurar los textos a envía vía correo electrónico</p>
                     </div>
                 </dv>
 

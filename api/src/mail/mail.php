@@ -323,8 +323,7 @@ if (isset($_GET['send'])) {
             }
 
             $strQuery = "   UPDATE masivos.dbo.thread
-                            SET status = {$objThread->status},
-                                percentage = {$objThread->percentage},
+                            SET percentage = {$objThread->percentage},
                                 send = {$objThread->send},
                                 length = {$objThread->length}
                             WHERE id_thread = {$objThread->id_thread}";

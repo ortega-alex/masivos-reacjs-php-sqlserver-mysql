@@ -41,11 +41,11 @@ export default function _mails(state = {}, action) {
                 ...state,
                 threads: action.threads
             };
-        case MailConstants.OPEN_OR_CLOSE_PANEL:
-            return {
-                ...state,
-                modal_panel: action.modal_panel
-            };
+        // case MailConstants.OPEN_OR_CLOSE_PANEL:
+        //     return {
+        //         ...state,
+        //         modal_panel: action.modal_panel
+        //     };
         default:
             return state
     }

@@ -10,8 +10,6 @@ if (extension_loaded('mssql')) {
 }
 $_url = "http://168.234.50.2:8080/dev/masivo/api/public/img/";
 
-// require_once '../config/dbClassMysql.php';
-// $_con = new dbClassMysql();
 getHeader();
 
 $res['err'] = "true";

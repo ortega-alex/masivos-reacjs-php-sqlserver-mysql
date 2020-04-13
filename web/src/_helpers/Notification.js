@@ -1,13 +1,9 @@
 import React, { Component } from "react";
 import { Button, Progress } from "antd";
-// import { Link } from 'react-router-dom';
 
 class Notification extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-
-        }
     }
 
     render() {
@@ -35,14 +31,8 @@ class Notification extends Component {
                     </div>
                 </div>
                 <div className="row">
-                    <div className="col-2 offset-10 mt-2">
-                        <Button
-                            type="primary"
-                            size="small"
-                            onClick={() => this.props.handleOpen(thread.id_thread)}
-                        >
-                            Abrir
-                        </Button>
+                    <div className="col-4 offset-8 mt-2">
+                        {this.props.handleOpen(thread.id_thread)}
                     </div>
                 </div>
             </div>

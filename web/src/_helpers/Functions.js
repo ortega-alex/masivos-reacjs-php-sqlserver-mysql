@@ -71,7 +71,7 @@ function validEmail(text) {
     return reg.test(text);
 }
 
-export default  {
+export default {
     removeTildes,
     replaceSpaces,
     commaSeparateNumber,

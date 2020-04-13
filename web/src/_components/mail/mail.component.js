@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { DatePicker, Tooltip, Button, Divider, Dropdown, Menu, Icon, Progress, Badge } from "antd";
+import { DatePicker, Tooltip, Button, Divider, Menu, Progress, Badge } from "antd";
 import moment from "moment";
 import Rodal from "rodal";
 import { AsyncStorage } from "AsyncStorage";
@@ -11,7 +11,6 @@ import mailActionts from "../../_actionts/mail.actionts";
 import Table from "../../_helpers/Table";
 import Form from "../../_helpers/Form";
 import clientActionts from "../../_actionts/client.actionts";
-// import Functions from "../../_helpers/Functions";
 import TextEditor from "../../_helpers/TextEditor";
 import Loading from "../../_helpers/Loading";
 
@@ -83,7 +82,7 @@ class Mail extends Component {
                 <div className="row">
                     <div className="col-md-8 offset-md-2 text-center">
                         <p className="p-0 m-0 h3"><b>ENVIO DE CORREOS MASIVOS</b></p>
-                        <p className="m-0 p-0">Permite seleccionar diferentes filtros para enviar campa;as de correos de forma automactica</p>
+                        <p className="m-0 p-0">Permite administrar los diferentes lotes ha enviar vía correo electrónico de manera automática</p>
                     </div>
                 </div>
                 <div className="row">
@@ -118,26 +117,21 @@ class Mail extends Component {
                         </div>
                     </div>
                     <div className="col-md-2 offset-md-6 mt-3 text-right">
-                        <Dropdown
-                            overlay={
-                                <Menu theme="dark">
-                                    <Item onClick={() => { this.setState({ modal: true }) }} >
-                                        <Icon type="plus-circle" />Nuevo
-                                    </Item>
-                                    <Item onClick={this.handleGetLotes.bind(this)}>
-                                        <Icon type="unordered-list" />Estado lotes
-                                    </Item>
-                                </Menu>
-                            }
-                        >
-                            <Button type="primary" icon="setting">
-                                Opciones
+
+                        <Tooltip title="Permite generar un lote para el envio de correos">
+                            <Button
+                                type="primary"
+                                icon="plus-circle"
+                                onClick={() => this.setState({ modal: true, id_texto: undefined, estado: true, content: undefined })}
+                            >
+                                Nuevo
                             </Button>
-                        </Dropdown>
+                        </Tooltip>
+
                     </div>
                 </div>
 
-                <div style={{ width: '100%', height: '68vh', overflowY: 'auto', overflowX: 'hidden', marginTop: 5 }}>
+                <div className="thread-panel">
                     {threads && threads.map((item, i) => {
                         return (
                             <div className="row row-thread" key={i}>
@@ -303,8 +297,6 @@ class Mail extends Component {
         const { user } = this.state;
         values.id_usuario = user.id_usuario;
         this.props.dispatch(mailActionts.addLot(values));
-        // Functions.message('info', 'lote creado. en unos momentos se procedera con el envio!');
-        // this.setState({ modal: false });
     }
 
     handleOptionsChange(value, res) {
@@ -354,7 +346,7 @@ class Mail extends Component {
                     <br /><br />
                     <div>
                         <Table
-                            height="450px"  
+                            height="450px"
                             data={mails}
                             arr={table}
                         />
@@ -417,9 +409,9 @@ class Mail extends Component {
 
 function mapsStateToProps(state) {
     const { _mails, _clients } = state;
-    const { mails, lote, threads, modal_panel, _disabled } = _mails;
+    const { mails, lote, threads, _disabled } = _mails;
     const { clientes_activos, productos_cliente, textos_cliente } = _clients;
-    return { mails, lote, clientes_activos, productos_cliente, textos_cliente, threads, modal_panel, _disabled };
+    return { mails, lote, clientes_activos, productos_cliente, textos_cliente, threads, _disabled };
 }
 
 export default connect(mapsStateToProps)(Mail);

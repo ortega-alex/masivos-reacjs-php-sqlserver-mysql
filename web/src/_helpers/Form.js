@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Form as FromAntd, Input, InputNumber, Icon, Tabs, Switch, DatePicker, Select, Button, Upload } from 'antd';
+import { Form as FromAntd, Input, InputNumber, Icon, Tabs, Switch, DatePicker, Select, Button } from 'antd';
 
 var moment = require('moment');
 require("moment/min/locales.min");
@@ -77,7 +77,7 @@ class Form extends Component {
     handleGetItem(res, i) {
         const { getFieldDecorator } = this.props.form;
         const { content } = this.props;
-        
+
         if (res.type == 6) {
             return (
                 <div className={`col-md-${res.col ? res.col : 12}`} key={i}>
@@ -87,24 +87,6 @@ class Form extends Component {
                             initialValue: (content != undefined && content[res.value] != undefined ? moment(content[res.value], "DD-MM-YYYY") : moment())
                         })(
                             this.handleDatePicker(res)
-                        )}
-                    </Item>
-                </div>
-            );
-        } else if (res.type == 8) {
-            return (
-                <div className={`col-md-${res.col ? res.col : 12}`} key={i}>
-                    <Item label={res.name} className="label">
-                        {getFieldDecorator(res.value, {
-                            valuePropName: 'fileList',
-                            getValueFromEvent: (e) => { 
-                                if (Array.isArray(e)) {
-                                    return e;
-                                }
-                                return e && e.fileList;
-                            },
-                        })(
-                            this.handleUploadImage()
                         )}
                     </Item>
                 </div>
@@ -199,7 +181,6 @@ class Form extends Component {
 
     handleSelect(res) {
         const { options } = this.props;
-        // var condicion = (!res.limpiar) ? '' : null;
         return (
             <Select
                 className="inp"
@@ -225,29 +206,15 @@ class Form extends Component {
         );
     }
 
-    handleUploadImage() {
-        return (
-            <Upload
-                name="logo" 
-                action="/upload.do" 
-                listType="picture"
-            >
-                <Button>
-                    <Icon type="upload" /> Click to upload
-              </Button>
-            </Upload>
-        )
-    }
-
     handleSubmit(e) {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 const { no_reset } = this.props;
                 this.props.handleSubmit(values);
-                // if (!no_reset) {
-                //     this.props.form.resetFields();
-                // }
+                if (!no_reset) {
+                    this.props.form.resetFields();
+                }
             }
         });
     }

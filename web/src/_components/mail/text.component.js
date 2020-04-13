@@ -18,10 +18,10 @@ const table = [
     { header: 'Opciones', value: null, filter: false, type: 4, edit: true, status: true }
 ];
 const form = [
-    { name: 'Cliente', value: 'id_cliente', required: true, type: 7, option: 'clientes', col: 6 },
-    { name: 'Correo de envio', value: 'sender', required: true, type: 1, icon: 'mail', col: 6 },
-    { name: 'Titulo', value: 'subject', required: true, type: 1, icon: 'font-size', col: 6 },
-    { name: 'Descripcion', value: 'descripcion', required: true, type: 1, icon: 'bold', col: 6 }
+    { name: 'Cliente', value: 'id_cliente', required: true, type: 7, option: 'clientes' },
+    { name: 'Correo de envio', value: 'sender', required: true, type: 1, icon: 'mail' },
+    { name: 'Titulo', value: 'subject', required: true, type: 1, icon: 'font-size' },
+    { name: 'Descripcion', value: 'descripcion', required: true, type: 1, icon: 'bold' }
 ];
 
 class Text extends Component {
@@ -54,7 +54,7 @@ class Text extends Component {
                 <dv className="row">
                     <div className="col-md-8 offset-md-2 text-center">
                         <p className="m-0 p-0 h3">TEXTO CORREO</p>
-                        <p className="m-0 p-0">informacion adicional que describe accion</p>
+                        <p className="m-0 p-0">Permite administrar las diferentes platillas de texto a utilizar en el envió de correos electrónicos dentro del sistema.</p>
                     </div>
                 </dv>
 
@@ -121,8 +121,8 @@ class Text extends Component {
                 closeMaskOnClick
                 showCloseButton={true}
                 customStyles={{ borderRadius: 10 }}
-                width={(600)}
-                height={600}
+                width={window.innerWidth - 200}
+                height={window.innerHeight - 100}
             >
                 <div className="txt-mail">
                     <div className="row">
@@ -142,20 +142,26 @@ class Text extends Component {
                             <p className="m-0 p-0 h-4">{id_texto ? 'EDITAR' : 'NUEVO'} TEXTO CORREO</p>
                         </div>
                     </div>
-                    <Form
-                        edit={true}
-                        footer={true}
-                        options={{ clientes }}
-                        arr={form}
-                        content={content}
-                        handleSubmit={this.handleSubmit.bind(this)}
-                    />
-                    <TextEditor
-                        body={content && content.body ? content.body : ''}
-                        onEditorChange={this.handleOnEditorChange.bind(this)}
-                        height={300}
-                        image_list={images_activas}
-                    />
+                    <div className="row">
+                        <div className="col-md-4">
+                            <Form
+                                edit={true}
+                                footer={true}
+                                options={{ clientes }}
+                                arr={form}
+                                content={content}
+                                handleSubmit={this.handleSubmit.bind(this)}
+                            />
+                        </div>
+                        <div className="col-md-8">
+                            <TextEditor
+                                body={content && content.body ? content.body : ''}
+                                onEditorChange={this.handleOnEditorChange.bind(this)}
+                                height={window.innerHeight - 200}
+                                image_list={images_activas}
+                            />
+                        </div>
+                    </div>
                 </div>
             </Rodal>
         );

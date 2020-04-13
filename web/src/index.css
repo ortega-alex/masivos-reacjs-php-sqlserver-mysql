@@ -10,7 +10,6 @@ code {
 }
 
 .app {
-    /* display: inline-flex; */
     height: 98vh !important;
     width: 100% !important;
     overflow: hidden;
@@ -24,8 +23,6 @@ code {
     height: 100%;
     align-items: center;
     justify-content: center;
-    /* background-position: center;
-    background-size: cover; */
     overflow: hidden;
 }
 
@@ -100,11 +97,11 @@ code {
     width: 400px;
     bottom: 10px;
     right: 20px;
-    z-index: 3000;   
+    z-index: 3000;
 }
 
 .notification {
-    background-color:#fb8c00;
+    background-color: #fb8c00;
     padding: 10px;
     border-radius: 5px;
     box-shadow: 0px 5px 10px #909497;
@@ -113,8 +110,8 @@ code {
 .row-thread {
     border-bottom: solid 1px lightgray;
     display: flex;
-   justify-content: center;
-   align-items: center;
+    justify-content: center;
+    align-items: center;
 }
 
 .tox-notifications-container, .tox-statusbar__branding {
@@ -136,4 +133,16 @@ code {
 .upload-transaction-title {
     position: absolute;
     font-weight: bold;
+}
+
+.thread-panel {
+    width: 100%;
+    height: 68vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    margin-top: 5px;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0px 5px 10px #909497;
+    padding: 5px;
 }

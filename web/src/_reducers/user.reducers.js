@@ -17,7 +17,7 @@ export default function _users(state = {}, action) {
             return {
                 ...state,
                 usuario: action.usuario
-            };      
+            };
         default:
             return state
     }

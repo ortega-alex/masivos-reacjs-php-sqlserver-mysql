@@ -5,11 +5,12 @@
 
 CREATE TABLE masivos.dbo.[image] (
 	id_image int IDENTITY(0,1) NOT NULL,
-	title varchar(100) NOT NULL,
-	value varchar(100) NOT NULL,
-	status char(1) DEFAULT 0,
-	fecha datetime DEFAULT getDate() NULL
+	title varchar(100) COLLATE Modern_Spanish_CI_AS NOT NULL,
+	value varchar(100) COLLATE Modern_Spanish_CI_AS NOT NULL,
+	fecha datetime NULL,
+	estado char(1) COLLATE Modern_Spanish_CI_AS NULL
 ) GO
+
 
 
 ------------------------------------------------------------------------------
@@ -21,6 +22,21 @@ CREATE TABLE masivos.dbo.[image] (
 
 ALTER TABLE masivos.dbo.outbound_correos ADD enviado char(1) DEFAULT 0 NULL GO
 
+CREATE TABLE masivos.dbo.outbound_correos (
+	Id_outbound_correos int IDENTITY(1,1) NOT NULL,
+	control varchar(30) COLLATE Modern_Spanish_CI_AS NULL,
+	email varchar(100) COLLATE Modern_Spanish_CI_AS NULL,
+	id_texto int NULL,
+	id_usuario_envia int NULL,
+	enviado char(1) COLLATE Modern_Spanish_CI_AS NULL,
+	fecha_envio datetime NULL,
+	fecha_creacion datetime NULL,
+	id_thread varchar(6) COLLATE Modern_Spanish_CI_AS NULL,
+	procesado bit NULL,
+	id_gestion_clave int NULL,
+	management text COLLATE Modern_Spanish_CI_AS NULL,
+	CONSTRAINT PK_outbound_correos PRIMARY KEY (Id_outbound_correos)
+) GO
 
 ------------------------------------------------------------------------------
 --                      2020-04-02  MARLON ORTEGA                           --
