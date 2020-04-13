@@ -15,7 +15,7 @@ class dbClassMSSQL
     {
         $resultado = mssql_query($strQuery);
         if (!$resultado) {
-            print "<pre>Ha ocurrido un error intente nuevamente:  <br> Query:  <br>" . $strQuery . " <br> Error: <br>" . mssql_error() . "</pre>";
+            print "<pre>Ha ocurrido un error intente nuevamente:  <br> Query:  <br>" . $strQuery . " <br> Error: <br>" . msql_error() . "</pre>";
             return null;
         } else {
             return $resultado;
@@ -29,7 +29,7 @@ class dbClassMSSQL
     {
         $resultado = mssql_query($strQuery);
         if (!$resultado) {
-            print "<pre>Ha ocurrido un error intente nuevamente:  <br> Query:  <br>" . $strQuery . " <br> Error: <br>" . mssql_error() . "</pre>";
+            print "<pre>Ha ocurrido un error intente nuevamente:  <br> Query:  <br>" . $strQuery . " <br> Error: <br>" . msql_error() . "</pre>";
             return null;
         } else {
             return $resultado;
@@ -68,5 +68,15 @@ class dbClassMSSQL
     public function db_num_rows($qTMP)
     {
         return mssql_num_rows($qTMP);
+    }
+
+     /*
+     *    para obtener la última identificación de inserción que se ha generado MySQL
+     */
+    public function db_last_id($_db)
+    {
+        $strQuery = "   SELECT IDENT_CURRENT('{$_db}') AS id";
+        $qTMP = $this->db_fetch_assoc($this->db_consulta($strQuery));
+        return intval($qTMP["id"]);
     }
 }

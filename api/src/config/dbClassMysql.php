@@ -2,14 +2,9 @@
 class dbClassMysql
 {
 
-    public function __construct($_db)
+    public function __construct()
     {
-        // $arr = array(
-        //     array('server' => 'localhost', 'db' => 'dbtickets', 'user' => 'root', 'pass' => 'root'),
-        //     // array('server' => '172.29.10.100', 'db' => 'oca_tickets', 'user'=> 'esaavedra', 'pass'=> 'EsAAv20166'),
-        // );
-        // $this->conexion = new mysqli($arr[$_db]['server'], $arr[$_db]['user'], $arr[$_db]['pass'], $arr[$_db]['db']);
-        $this->conexion = new mysqli('localhost', 'root', 'root', 'dbtickets');
+        $this->conexion = new mysqli('localhost', 'root', 'root', 'oca_sac');
         if ($this->conexion->connect_error) {
             die('Connect Error(' . $this->conexion->connect_errno . ') ' . $this->conexion->connect_error);
         }

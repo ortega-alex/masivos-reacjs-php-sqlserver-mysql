@@ -1,4 +1,18 @@
 ------------------------------------------------------------------------------
+--                      2020-04-12  MARLON ORTEGA                           --
+--  permite cargar las imagenes personalizadas para los textos a enviar     --
+------------------------------------------------------------------------------
+
+CREATE TABLE masivos.dbo.[image] (
+	id_image int IDENTITY(0,1) NOT NULL,
+	title varchar(100) NOT NULL,
+	value varchar(100) NOT NULL,
+	status char(1) DEFAULT 0,
+	fecha datetime DEFAULT getDate() NULL
+) GO
+
+
+------------------------------------------------------------------------------
 --                      2020-04-01  MARLON ORTEGA                           --
 --  Se realizo cambio de propiedad de atributo enviado de bit a char        --
 --  esto con el fin de poder manejar mas de dos estados (0 = no enviado,    --

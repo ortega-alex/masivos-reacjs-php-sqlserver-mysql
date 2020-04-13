@@ -8,7 +8,10 @@ if (extension_loaded('mssql')) {
     require_once '../config/dbClassPDO.php';
     $_con = new dbClassPDO();
 }
+$_url = "http://168.234.50.2:8080/dev/masivo/api/public/img/";
 
+// require_once '../config/dbClassMysql.php';
+// $_con = new dbClassMysql();
 getHeader();
 
 $res['err'] = "true";
@@ -21,6 +24,7 @@ $strBody = isset($_POST['body']) ? mb_convert_encoding(trim($_POST['body']), "UT
 $strDescripcion = isset($_POST['descripcion']) ? mb_convert_encoding(trim($_POST['descripcion']), "UTF-8") : '';
 $strSender = isset($_POST['sender']) ? trim($_POST['sender']) : '';
 $intEstado = isset($_POST['estado']) ? intval($_POST['estado']) : 0;
+$intIdImage = isset($_POST['id_image']) ? intval($_POST['id_image']) : 0;
 
 if (isset($_GET['get'])) {
     $strQuery = "   SELECT id_cliente, nombre
@@ -135,7 +139,7 @@ if (isset($_GET['add_text'])) {
                         WHERE Id_texto = {$intIdTexto}";
     } else {
         $strQuery = "   INSERT INTO masivos.dbo.correos_textos (id_cliente, subject, body, descripcion, sender, individual, suspendido)
-                        VALUES ({$intIdCliente}, '{$strSubject}', '{$strBody}', '{$strDescripcion}', '{$strSender}', {$intEstado})";
+                        VALUES ({$intIdCliente}, '{$strSubject}', '{$strBody}', '{$strDescripcion}', '{$strSender}', 0, {$intEstado})";
     }
 
     if ($_con->db_consulta($strQuery)) {
@@ -150,6 +154,74 @@ if (isset($_GET['change_status_text'])) {
     $strQuery = "   UPDATE masivos.dbo.correos_textos
                     SET suspendido = {$intEstado}
                     WHERE id_texto = {$intIdTexto}";
+    if ($_con->db_consulta($strQuery)) {
+        $res['err'] = 'false';
+        $res['msj'] = "Cambios realizados exitosamente!";
+    } else {
+        $res['msj'] = "Ha ocurrido un error!";
+    }
+}
+
+if (isset($_GET['get_images'])) {
+    $strQuery = "   SELECT id_image, title, value, fecha, estado
+                    FROM masivos.dbo.image
+                    ORDER BY fecha ";
+    $qTmp = $_con->db_consulta($strQuery);
+    $arr = array();
+    while ($rTmp = $_con->db_fetch_object($qTmp)) {
+        $arr[] = array(
+            'id_image' => $rTmp->id_image,
+            'title' => mb_convert_encoding(($rTmp->title), "UTF-8"),
+            'value' => $rTmp->value,
+            'fecha' => date('d-m-Y', strtotime($rTmp->fecha)),
+            'estado' => $rTmp->estado,
+        );
+    }
+    $res['images'] = $arr;
+}
+
+if (isset($_GET['get_images_activas'])) {
+    $strQuery = "   SELECT id_image, title, value
+                    FROM masivos.dbo.image
+                    WHERE estado = 0
+                    ORDER BY fecha ";
+    $qTmp = $_con->db_consulta($strQuery);
+    $arr = array();
+    while ($rTmp = $_con->db_fetch_object($qTmp)) {
+        $arr[] = array(
+            'id_image' => $rTmp->id_image,
+            'title' => mb_convert_encoding(($rTmp->title), "UTF-8"),
+            'value' => $_url . $rTmp->value            
+        );
+    }
+    $res['images_activas'] = $arr;
+}
+
+if (isset($_GET['add_image'])) {
+    if (sizeof($_FILES) > 0) {
+        $_name = $_FILES['file']['name'];
+        $_file = time() . "." . substr(strrchr($_name, "."), 1);
+        $_url = "../../public/img/" . $_file;
+
+        $_MV = move_uploaded_file($_FILES['file']['tmp_name'], $_url);
+        if (!empty($_MV)) {
+            $strQuery = "   INSERT INTO masivos.dbo.image (title, value)
+                            VALUES ('{$_name}', '{$_file}')";
+
+            if ($_con->db_consulta($strQuery)) {
+                $res['err'] = 'false';
+                $res['msj'] = "Carga realizada exitosamente!";
+            }
+        }
+    } else {
+        $res['msj'] = "No se pudo recuperar informacion de archivo!";
+    }
+}
+
+if (isset($_GET['change_status_image'])) {
+    $strQuery = "   UPDATE masivos.dbo.image
+                    SET estado = {$intEstado}
+                    WHERE id_image = {$intIdImage}";
     if ($_con->db_consulta($strQuery)) {
         $res['err'] = 'false';
         $res['msj'] = "Cambios realizados exitosamente!";

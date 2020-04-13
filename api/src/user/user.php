@@ -7,6 +7,8 @@ if (extension_loaded('mssql')) {
     require_once '../config/dbClassPDO.php';
     $_con = new dbClassPDO();
 }
+// require_once '../config/dbClassMysql.php';
+// $_con = new dbClassMysql();
 require_once '../config/helper.php';
 
 getHeader();
@@ -29,13 +31,13 @@ if (isset($_GET['login'])) {
     $qTmp = $_con->db_consulta($strQuery);
     if ($_con->db_num_rows($qTmp) > 0) {
         $rTmp = $_con->db_fetch_assoc($qTmp);
-        if (intval($rTmp['estado']) == 1) {            
+        if (intval($rTmp['estado']) == 1) {
             $nombres = explode(' ', $rTmp['nombres']);
             $apellidos = explode(' ', $rTmp['apellidos']);
             $user = array(
                 'id_usuario' => $rTmp['id_usuario'],
                 'usuario' => $strUsuario,
-                'nombre' => ($nombres[0] . ' ' . $apellidos[0])
+                'nombre' => ($nombres[0] . ' ' . $apellidos[0]),
             );
             $res['err'] = "false";
             $res['user'] = $user;

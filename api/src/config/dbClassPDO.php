@@ -70,4 +70,14 @@ class dbClassPDO
     {
         return $qTMP->rowCount();
     }
+
+    /*
+     *    para obtener la última identificación de inserción que se ha generado MySQL
+     */
+    public function db_last_id($_db)
+    {
+        $strQuery = "   SELECT IDENT_CURRENT('{$_db}') AS id";
+        $qTMP = $this->db_fetch_assoc($this->db_consulta($strQuery));
+        return intval($qTMP["id"]);
+    }
 }

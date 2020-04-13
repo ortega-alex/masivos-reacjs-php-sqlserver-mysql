@@ -24,7 +24,7 @@ const form = [
     { name: 'Descripcion', value: 'descripcion', required: true, type: 1, icon: 'bold', col: 6 }
 ];
 
-class Body extends Component {
+class Text extends Component {
 
     constructor(props) {
         super(props);
@@ -32,13 +32,15 @@ class Body extends Component {
             id_texto: undefined,
             modal: false,
             estado: true,
-            content: undefined
+            content: undefined,
+            _textos: undefined
         }
     }
 
     componentDidMount() {
         this.props.dispatch(clientActionts.getTextos());
         this.props.dispatch(clientActionts.get());
+        this.props.dispatch(clientActionts.getImagesACT());
     }
 
     render() {
@@ -75,9 +77,9 @@ class Body extends Component {
                     </div>
                     <div className="col-md-2 offset-md-8 text-right mt-3">
                         <Tooltip title="Permite configurar un nuevo texto dentro del sistema">
-                            <Button 
-                                type="primary" 
-                                icon="plus-circle" 
+                            <Button
+                                type="primary"
+                                icon="plus-circle"
                                 onClick={() => this.setState({ modal: true, id_texto: undefined, estado: true, content: undefined })}
                             >
                                 Nuevo
@@ -109,7 +111,7 @@ class Body extends Component {
 
     handleModal() {
         const { modal, id_texto, content, estado } = this.state;
-        const { clientes } = this.props;
+        const { clientes, images_activas } = this.props;
         return (
             <Rodal
                 animation="flip"
@@ -152,6 +154,7 @@ class Body extends Component {
                         body={content && content.body ? content.body : ''}
                         onEditorChange={this.handleOnEditorChange.bind(this)}
                         height={300}
+                        image_list={images_activas}
                     />
                 </div>
             </Rodal>
@@ -164,12 +167,12 @@ class Body extends Component {
             Functions.message('warning', 'por favor ingrese un correo valido!');
             return;
         }
-        if ( !content || !content.body ) {
+        if (!content || !content.body) {
             Functions.message('warning', 'por favor ingrese un texto!');
             return;
         }
         values.id_texto = id_texto;
-        values.estado = (estado == true ? 0 : 1); 
+        values.estado = (estado == true ? 0 : 1);
         values.body = content.body;
         this.props.dispatch(clientActionts.addText(values));
         this.setState({
@@ -183,9 +186,9 @@ class Body extends Component {
     handleOnEditorChange(value) {
         const { content } = this.state;
         var _content = {};
-        if ( content ) {
-            _content = content;           
-        } 
+        if (content) {
+            _content = content;
+        }
         _content.body = value;
         this.setState({ content: _content });
     }
@@ -200,20 +203,19 @@ class Body extends Component {
 
     handleEdit(texto) {
         const estado = texto.suspendido == 1 ? true : false;
-        console.log(texto);
         this.setState({
             estado,
             id_texto: texto.id_texto,
             content: texto,
             modal: true
-        }); 
+        });
     }
 }
 
 function mapsStateToProps(state) {
     const { _clients } = state;
-    const { clientes, textos } = _clients;
-    return { clientes, textos };
+    const { clientes, textos, images_activas } = _clients;
+    return { clientes, textos, images_activas };
 }
 
-export default connect(mapsStateToProps)(Body);
+export default connect(mapsStateToProps)(Text);

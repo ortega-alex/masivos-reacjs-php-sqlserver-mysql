@@ -4,13 +4,21 @@ import Functions from '../_helpers/Functions';
 export default function _mails(state = {}, action) {
     switch (action.type) {
         case MailConstants.REQUEST_MAIL:
-            return {
-                ...state
-            };
+            if (action._disabled != undefined) {
+                return {
+                    ...state,
+                    _disabled: action._disabled
+                };
+            } else {
+                return {
+                    ...state
+                };
+            }
         case MailConstants.FAILURE_MAIL:
             Functions.message("error", action.err.toString());
             return {
-                ...state
+                ...state,
+                _disabled: false
             };
         case MailConstants.SUCCESS_MAIL:
             Functions.message(action.tipo, action.msj.toString());

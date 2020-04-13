@@ -40,3 +40,28 @@ function nameMonth($n)
     );
     return $arr[intval($n) - 1];
 }
+
+function insertManagement($arr, $_con)
+{
+    $_management = mb_convert_encoding($arr['gestion'], "UTF-8");
+    $_year = date('Y');
+    $_month = date('m');
+    $_day = date('d');
+    $_time = date('H');
+    $_telefono = "Información";
+    $strQuery = "	INSERT INTO oca_sac.dbo.gestion (id_remesa, no_linea, id_usuario, id_gestion_clave, observaciones,
+                                                    fecha_inicio, fecha_fin, telefono, descripcion_telefono, fecha_seguimiento,
+                                                    fecha_pago, monto, automatico, monto_2, confirmacion,
+                                                    porcentaje_descuento, descuento, porcentaje_descuento_2, descuento_2, mes,
+                                                    ano, dia, hora)
+                    SELECT b.id_remesa, b.no_linea, isnull({$arr['id_usuario']},1), b.id_gestion_clave, '{$_management}',
+                            CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '{$_telefono}', '{$_telefono}', b.fecha_seguimiento,
+                            b.promesa_fecha_pago, b.promesa_monto, 0, b.promesa_monto_2, 0,
+                            b.porcentaje_descuento, b.descuento, b.porcentaje_descuento_2, b.descuento_2, '{$_month}',
+                            '{$_year}', '{$_day}', '{$_time}'
+                    FROM oca_sac.dbo.remesas_cuentas b
+                    WHERE control = '{$arr['control']}'";
+                    // print($strQuery);
+                    // exit();
+    $_con->db_consulta($strQuery);
+}

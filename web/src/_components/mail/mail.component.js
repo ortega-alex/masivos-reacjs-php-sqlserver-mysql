@@ -1,16 +1,19 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { DatePicker, Tooltip, Button, Divider, Dropdown, Menu, Icon, notification, Progress } from "antd";
+import { DatePicker, Tooltip, Button, Divider, Dropdown, Menu, Icon, Progress, Badge } from "antd";
 import moment from "moment";
 import Rodal from "rodal";
 import { AsyncStorage } from "AsyncStorage";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck, faCheckDouble, faBan } from '@fortawesome/free-solid-svg-icons';
 
 import mailActionts from "../../_actionts/mail.actionts";
 import Table from "../../_helpers/Table";
 import Form from "../../_helpers/Form";
 import clientActionts from "../../_actionts/client.actionts";
-import Functions from "../../_helpers/Functions";
+// import Functions from "../../_helpers/Functions";
 import TextEditor from "../../_helpers/TextEditor";
+import Loading from "../../_helpers/Loading";
 
 require("moment/min/locales.min");
 moment.locale('es');
@@ -24,6 +27,7 @@ const table = [
     { header: 'Correo', value: 'email', filter: true, type: 1 },
     { header: 'Detalle', value: 'descripcion', filter: true, type: 1 },
     { header: 'Usuario', value: 'usuario', filter: true, type: 1 },
+    { header: 'Gestion', value: 'gestion', filter: true, type: 1 },
     { header: 'Enviado', value: 'enviado', filter: true, type: 6 }
 ];
 
@@ -38,41 +42,44 @@ class Mail extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            date_start: moment(),
-            date_end: moment(),
+            date_start: moment().startOf('month'),
+            date_end: moment().endOf('month'),
             modal: false,
             content: undefined,
             user: undefined,
             body: '',
-            modal_text: false
+            modal_text: false,
+            modal_detalle: false
         };
     }
 
     componentDidMount() {
+        this.handleGet();
         AsyncStorage.getItem('login_massive', (err, res) => {
             if (!err && res && res != "undefined") {
                 var user = JSON.parse(res);
                 this.setState({ user: user });
             }
         });
-        this.handleGet();
         this.props.dispatch(clientActionts.getActivos());
     }
 
     render() {
-        const { date_start, date_end, modal, modal_text } = this.state;
-        const { mails, modal_panel } = this.props;
+        const { date_start, date_end, modal, modal_text, modal_detalle } = this.state;
+        const { threads } = this.props;
         return (
-            <div style={{ position: 'relative' }}>               
+            <div style={{ position: 'relative' }}>
+                {modal_detalle &&
+                    this.handleModalDetalle()
+                }
+
                 {modal &&
                     this.handleModal()
                 }
-                {modal_panel &&
-                    this.handleModalLotes()
-                }
-                 {modal_text &&
+                {modal_text &&
                     this.handleModalText()
                 }
+
                 <div className="row">
                     <div className="col-md-8 offset-md-2 text-center">
                         <p className="p-0 m-0 h3"><b>ENVIO DE CORREOS MASIVOS</b></p>
@@ -129,10 +136,94 @@ class Mail extends Component {
                         </Dropdown>
                     </div>
                 </div>
-                <Table
-                    data={mails}
-                    arr={table}
-                />
+
+                <div style={{ width: '100%', height: '68vh', overflowY: 'auto', overflowX: 'hidden', marginTop: 5 }}>
+                    {threads && threads.map((item, i) => {
+                        return (
+                            <div className="row row-thread" key={i}>
+                                <div className="col-4 text-center">
+                                    <p className="m-0 p-0 h6">{item.name}</p>
+                                    <p className="m-0 p-0">{item.usuario}/{item.fecha_creacion}</p>
+                                </div>
+                                <div className="col-3 text-center">
+                                    <div className="row">
+                                        <div className="col-md-3" onClick={() => this.handleDetalle(3, item)}>
+                                            <Tooltip title="Correo no valido">
+                                                <Badge
+                                                    count={item.detalle && item.detalle[3] ? item.detalle[3] : 0}
+                                                    offset={[15, 0]}
+                                                    overflowCount={99999}
+                                                    showZero={true}
+                                                >
+                                                    <FontAwesomeIcon icon={faBan} color="red" />
+                                                </Badge>
+                                            </Tooltip>
+                                        </div>
+                                        <div className="col-md-3" onClick={() => this.handleDetalle(0, item)}>
+                                            <Tooltip title="Pendiente de enviar">
+                                                <Badge
+                                                    count={item.detalle && item.detalle[0] ? item.detalle[0] : 0}
+                                                    offset={[15, 0]}
+                                                    overflowCount={99999}
+                                                    showZero
+                                                    style={{ backgroundColor: '#90a4ae' }}
+                                                >
+                                                    <FontAwesomeIcon icon={faCheck} color="#90a4ae" />&nbsp;&nbsp;&nbsp;
+                                                </Badge>
+                                            </Tooltip>
+                                        </div>
+                                        <div className="col-md-3" onClick={() => this.handleDetalle(1, item)}>
+                                            <Tooltip title="Enviado">
+                                                <Badge
+                                                    count={item.detalle && item.detalle[1] ? item.detalle[1] : 0}
+                                                    offset={[15, 0]}
+                                                    overflowCount={99999}
+                                                    showZero
+                                                    style={{ backgroundColor: '#81c784' }}
+                                                >
+                                                    <FontAwesomeIcon icon={faCheck} color="#81c784" />&nbsp;&nbsp;&nbsp;
+                                            </Badge>
+                                            </Tooltip>
+                                        </div>
+                                        <div className="col-md-3" onClick={() => this.handleDetalle(2, item)}>
+                                            <Tooltip title="Leido">
+                                                <Badge
+                                                    count={item.detalle && item.detalle[2] ? item.detalle[2] : 0}
+                                                    offset={[15, 0]}
+                                                    overflowCount={99999}
+                                                    showZero
+                                                    style={{ backgroundColor: 'green' }}
+                                                >
+                                                    <FontAwesomeIcon icon={faCheckDouble} color="green" />&nbsp;&nbsp;&nbsp;
+                                            </Badge>
+                                            </Tooltip>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-4">
+                                    <Progress percent={item.percentage} />
+                                </div>
+                                <div className="col-1 text-center">
+                                    <Button
+                                        type="primary"
+                                        icon="redo"
+                                        className="ml-1"
+                                        size="small"
+                                        icon={(item.send == item.length) ? 'redo' : ((item.status == 1) ? 'play-circle' : 'pause')}
+                                        onClick={() => {
+                                            if (item.send == item.length) {
+                                                const values = item;
+                                                this.handleAdd(values);
+                                            } else {
+                                                this.handleActios(item);
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        )
+                    })}
+                </div>
             </div>
         );
     }
@@ -145,13 +236,13 @@ class Mail extends Component {
                 date_start: date_start.format('YYYY-MM-DD'),
                 date_end: date_end.format('YYYY-MM-DD')
             };
-            this.props.dispatch(mailActionts.get(data));
+            this.props.dispatch(mailActionts.getThreads(data));
         }
     }
 
     handleModal() {
         const { modal, content } = this.state;
-        const { clientes_activos, productos_cliente, textos_cliente } = this.props;
+        const { clientes_activos, productos_cliente, textos_cliente, _disabled } = this.props;
         return (
             <Rodal
                 animation={'slideRight'}
@@ -179,6 +270,7 @@ class Mail extends Component {
                         footer={true}
                         options={{ clientes_activos, productos_cliente, textos_cliente }}
                         arr={form}
+                        disabled={_disabled}
                         content={content}
                         handleSubmit={this.handleAdd.bind(this)}
                         optionsChange={this.handleOptionsChange.bind(this)}
@@ -195,6 +287,13 @@ class Mail extends Component {
                     <p className="text-center" style={{ color: '#bdbdbd' }}>
                         Enviar No incluye los siguientes estatus PROMESA DE PAGO, ACLARACION,FINIQUITO,RETENIDO POR EL CLIENTE,CHEQUE PREFECHADO
                     </p>
+
+                    {(_disabled == true) &&
+                        <div className="upload-transaction">
+                            <Loading type={true} />
+                            <p className="upload-transaction-title">En proceso...</p>
+                        </div>
+                    }
                 </div>
             </Rodal>
         );
@@ -203,13 +302,13 @@ class Mail extends Component {
     handleAdd(values) {
         const { user } = this.state;
         values.id_usuario = user.id_usuario;
-        this.props.dispatch(mailActionts.getLote(values));
-        Functions.message('info', 'lote creado. en unos momentos se procedera con el envido!');
-        this.setState({ modal: false });
+        this.props.dispatch(mailActionts.addLot(values));
+        // Functions.message('info', 'lote creado. en unos momentos se procedera con el envio!');
+        // this.setState({ modal: false });
     }
 
     handleOptionsChange(value, res) {
-      console.log(value, res);
+        console.log(value, res);
         if (res == 'id_cliente') {
             this.props.dispatch(clientActionts.getProductoCliente({ 'id_cliente': value }));
             this.props.dispatch(clientActionts.getTextoCliente({ 'id_cliente': value }));
@@ -228,59 +327,42 @@ class Mail extends Component {
         this.props.dispatch(mailActionts.OpenOrClosePanel(true, user.id_usuario));
     }
 
-    handleModalLotes() {
-        const { threads, modal_panel } = this.props;
+    handleModalDetalle() {
+        const { mails } = this.props;
+        const { modal_detalle } = this.state;
         return (
             <Rodal
                 animation={'slideLeft'}
                 duration={500}
-                visible={modal_panel}
-                onClose={() => { this.props.dispatch(mailActionts.OpenOrClosePanel(false)) }}
+                visible={modal_detalle}
+                onClose={() => this.setState({ modal_detalle: !modal_detalle })}
                 closeMaskOnClick
                 showCloseButton={true}
                 customStyles={{ borderRadius: 10 }}
-                width={(window.innerWidth < 700 || window.innerHeight < 550 ? window.innerWidth : 700)}
-                height={(window.innerWidth < 700 || window.innerHeight < 550 ? window.innerHeight : 550)}
+                width={(window.innerWidth < 900 || window.innerHeight < 550 ? window.innerWidth : 900)}
+                height={(window.innerWidth < 900 || window.innerHeight < 550 ? window.innerHeight : 550)}
             >
                 <div>
                     <div className="row">
                         <div className="col-12 text-center">
                             <p className="p-0 m-0 h4">
-                                Adminitracion de lotes
+                                DETALLE LOTE
                             </p>
                         </div>
                     </div>
                     <Divider style={{ backgroundColor: '#4caf50' }} />
-
-                    <div style={{ width: '100%', height: window.innerHeight < 550 ? (window.innerHeight - 300) : 500, overflowY: 'auto', overflowX: 'hidden' }}>
-                        {threads && threads.map((item, i) => {
-                            return (
-                                <div className="row row-thread" key={i}>
-                                    <div className="col-6 mt-1 text-center">
-                                        <p className="m-0 p-0 h6">{item.name}</p>
-                                        <p className="m-0 p-0">{item.fecha_creacion}</p>
-                                    </div>
-                                    <div className="col-4">
-                                        <Progress percent={item.percentage} />
-                                    </div>
-                                    <div className="col-2">
-                                        <Button
-                                            type="link"
-                                            icon="redo"
-                                            className="ml-1"
-                                            size="small"
-                                            icon={(item.send == item.length) ? 'redo' : ((item.status == 1) ? 'play-circle' : 'pause-circle')}
-                                        />
-                                    </div>
-                                </div>
-                            )
-                        })}
+                    <br /><br />
+                    <div>
+                        <Table
+                            height="450px"  
+                            data={mails}
+                            arr={table}
+                        />
                     </div>
                 </div>
             </Rodal>
         );
     }
-
 
     handleModalText() {
         const { modal_text, body } = this.state;
@@ -311,13 +393,33 @@ class Mail extends Component {
             </Rodal>
         );
     }
+
+    handleActios(thread) {
+        var _thread = thread;
+        _thread.get_thread = 1;
+        _thread.status = thread.status == 1 ? 0 : 1;
+        this.props.dispatch(mailActionts.changeStatusThread(_thread));
+    }
+
+    handleDetalle(send, thread) {
+        const data = {
+            'id_thread': thread.id_thread,
+            'enviado': send,
+            'date_start': moment(thread.fecha_creacion, "DD-MM-YYYY").format('YYYY-MM-DD'),
+            'date_end': moment(thread.fecha_creacion, "DD-MM-YYYY").format('YYYY-MM-DD'),
+        };
+        this.props.dispatch(mailActionts.get(data));
+        this.setState({
+            modal_detalle: true
+        });
+    }
 }
 
 function mapsStateToProps(state) {
     const { _mails, _clients } = state;
-    const { mails, lote, threads, modal_panel } = _mails;
+    const { mails, lote, threads, modal_panel, _disabled } = _mails;
     const { clientes_activos, productos_cliente, textos_cliente } = _clients;
-    return { mails, lote, clientes_activos, productos_cliente, textos_cliente, threads, modal_panel };
+    return { mails, lote, clientes_activos, productos_cliente, textos_cliente, threads, modal_panel, _disabled };
 }
 
 export default connect(mapsStateToProps)(Mail);

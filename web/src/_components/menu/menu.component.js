@@ -9,7 +9,8 @@ import Message from "../message/message.component";
 import Mail from "../mail/mail.component";
 import Notification from "../../_helpers/Notification";
 import mailActionts from '../../_actionts/mail.actionts';
-import Body from "../mail/body.component";
+import Text from "../mail/text.component";
+import Image from "../mail/image.component";
 
 const { Item, SubMenu } = MenuAntd;
 
@@ -39,7 +40,7 @@ class Menu extends Component {
         const { notification } = this.props;
         return (
             <HashRouter>
-                {notification &&
+                {(notification && pathname != '/' ) &&
                     this.handleNotificacion()
                 }
                 <MenuAntd
@@ -50,7 +51,7 @@ class Menu extends Component {
                     <Item key="/" >
                         <Link to="/"
                             onClick={() => { this.setState({ pathname: "/" }) }}
-                            style={{ color: pathname == '/' ? 'black' : color }}
+                            style={{ color: pathname == '/' ? 'green' : color }}
                         >
                             <Icon type="mail" />
                             <span>Correos</span>
@@ -59,7 +60,7 @@ class Menu extends Component {
                     <Item key="/message">
                         <Link to="/message"
                             onClick={() => { this.setState({ pathname: "/message" }) }}
-                            style={{ color: pathname == '/message' ? 'black' : color }}
+                            style={{ color: pathname == '/message' ? 'green' : color }}
                         >
                             <Icon type="message" />
                             <span>Mensajes</span>
@@ -79,6 +80,14 @@ class Menu extends Component {
                             <Icon type="user" />
                             <span>{user.nombre}</span>
                         </Item>
+                        <Item key="/imagenes">
+                            <Link to="/imagenes"
+                                onClick={() => { this.setState({ pathname: "/imagenes" }) }}
+                            >
+                                <Icon type="file-image" />
+                                <span>Imagenes</span>
+                            </Link>
+                        </Item>
                         <Item key="/textos">
                             <Link to="/textos"
                                 onClick={() => { this.setState({ pathname: "/textos" }) }}
@@ -97,7 +106,8 @@ class Menu extends Component {
                 <div className="m-3">
                     <Route path="/" exact component={Mail} />
                     <Route path="/message" component={Message} />
-                    <Route path="/textos" component={Body} />
+                    <Route path="/textos" component={Text} />
+                    <Route path="/imagenes" component={Image} />
                 </div>
             </HashRouter>
         );

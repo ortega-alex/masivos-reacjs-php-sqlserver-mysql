@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Form as FromAntd, Input, InputNumber, Icon, Tabs, Switch, DatePicker, Select, Button } from 'antd';
+import { Form as FromAntd, Input, InputNumber, Icon, Tabs, Switch, DatePicker, Select, Button, Upload } from 'antd';
 
 var moment = require('moment');
 require("moment/min/locales.min");
@@ -77,11 +77,7 @@ class Form extends Component {
     handleGetItem(res, i) {
         const { getFieldDecorator } = this.props.form;
         const { content } = this.props;
-        const layout = {
-            labelCol: { span: 8 },
-            wrapperCol: { span: 16 },
-        };
-
+        
         if (res.type == 6) {
             return (
                 <div className={`col-md-${res.col ? res.col : 12}`} key={i}>
@@ -94,7 +90,25 @@ class Form extends Component {
                         )}
                     </Item>
                 </div>
-            )
+            );
+        } else if (res.type == 8) {
+            return (
+                <div className={`col-md-${res.col ? res.col : 12}`} key={i}>
+                    <Item label={res.name} className="label">
+                        {getFieldDecorator(res.value, {
+                            valuePropName: 'fileList',
+                            getValueFromEvent: (e) => { 
+                                if (Array.isArray(e)) {
+                                    return e;
+                                }
+                                return e && e.fileList;
+                            },
+                        })(
+                            this.handleUploadImage()
+                        )}
+                    </Item>
+                </div>
+            );
         } else {
             return (
                 <div className={`col-md-${res.col ? res.col : 12}`} key={i}>
@@ -117,7 +131,7 @@ class Form extends Component {
                         )}
                     </Item>
                 </div>
-            )
+            );
         }
     }
 
@@ -209,6 +223,20 @@ class Form extends Component {
                 }
             </Select>
         );
+    }
+
+    handleUploadImage() {
+        return (
+            <Upload
+                name="logo" 
+                action="/upload.do" 
+                listType="picture"
+            >
+                <Button>
+                    <Icon type="upload" /> Click to upload
+              </Button>
+            </Upload>
+        )
     }
 
     handleSubmit(e) {

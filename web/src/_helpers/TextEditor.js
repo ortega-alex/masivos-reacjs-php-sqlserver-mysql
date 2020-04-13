@@ -8,22 +8,26 @@ class TextEditor extends Component {
     }
 
     render() {
-        const { body, height, disabled } = this.props
-        return(
+        const { body, height, disabled, image_list } = this.props
+        return (
             <Editor
                 initialValue={body}
                 init={{
                     height: height,
-                    menubar: false,
+                    menubar: 'insert',
+                    selector: 'textarea',  // change this value according to your HTML
                     plugins: [
+                        'image',
                         'advlist autolink lists link image charmap print preview anchor',
                         'searchreplace visualblocks code fullscreen',
                         'insertdatetime media table paste code help wordcount'
                     ],
                     toolbar:
-                        'undo redo | formatselect | bold italic backcolor | \
+                        'image | undo redo | formatselect | bold italic backcolor | \
                         alignleft aligncenter alignright alignjustify | \
-                        bullist numlist outdent indent | removeformat | help'
+                        bullist numlist outdent indent | removeformat | help',
+                    image_list: image_list,
+                    language: 'es',
                 }}
                 onEditorChange={(value) => {
                     if (!disabled) {
@@ -31,7 +35,7 @@ class TextEditor extends Component {
                     }
                 }}
                 disabled={disabled ? disabled : false}
-            /> 
+            />
         );
     }
 }
