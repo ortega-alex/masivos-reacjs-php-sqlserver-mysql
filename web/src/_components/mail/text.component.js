@@ -1,24 +1,26 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Tooltip, Select, Button, Switch } from "antd";
+import { Tooltip, Button, Switch } from "antd";
 import Rodal from "rodal";
 
-import clientActionts from "../../_actionts/client.actionts";
+import textActionts from "../../_actionts/text.actionts";
+import clientActions from "../../_actionts/client.actionts";
 import Table from "../../_helpers/Table";
 import Form from "../../_helpers/Form";
 import TextEditor from "../../_helpers/TextEditor";
 import Functions from "../../_helpers/Functions";
 
-const { Option } = Select;
 const table = [
+    { header: 'Operacion', value: 'operacion', filter: true, type: 1 },
     { header: 'Cliente', value: 'nombre', filter: true, type: 1 },
     { header: 'Descripcion', value: 'descripcion', filter: true, type: 1 },
     { header: 'Titulo', value: 'subject', filter: true, type: 1 },
-    { header: 'Suspendido', value: 'estado', filter: true, type: 3 },
-    { header: 'Opciones', value: null, filter: false, type: 4, edit: true, status: true }
+    { header: 'Suspendido', value: 'estado', filter: true, type: 7 },
+    { header: 'Opciones', value: null, filter: false, type: 4, edit: true, discontinued: true }
 ];
 const form = [
-    { name: 'Cliente', value: 'id_cliente', required: true, type: 7, option: 'clientes' },
+    { name: 'Operacion', value: 'id_operation', required: true, type: 7, option: 'operaciones', change: true, col: 6 },
+    { name: 'Cliente', value: 'id_cliente', required: true, type: 7, option: 'clientes_activos', col: 6 },
     { name: 'Correo de envio', value: 'sender', required: true, type: 1, icon: 'mail' },
     { name: 'Titulo', value: 'subject', required: true, type: 1, icon: 'font-size' },
     { name: 'Descripcion', value: 'descripcion', required: true, type: 1, icon: 'bold' }
@@ -32,20 +34,19 @@ class Text extends Component {
             id_texto: undefined,
             modal: false,
             estado: true,
-            content: undefined,
-            _textos: undefined
+            content: undefined
         }
     }
 
     componentDidMount() {
-        this.props.dispatch(clientActionts.getTextos());
-        this.props.dispatch(clientActionts.get());
-        this.props.dispatch(clientActionts.getImagesACT());
+        this.props.dispatch(textActionts.get());
+        this.props.dispatch(clientActions.getOperation());
+        this.props.dispatch(textActionts.getImagesACT());
     }
 
     render() {
-        const { modal, _textos } = this.state;
-        const { textos, clientes } = this.props;
+        const { modal } = this.state;
+        const { textos } = this.props;
         return (
             <div>
                 {modal &&
@@ -59,23 +60,7 @@ class Text extends Component {
                 </dv>
 
                 <div className="row">
-                    <div className="col-md-2">
-                        <Tooltip title="Permite filtrar por el cliente"><b>Cliente:</b></Tooltip>
-                        <Select
-                            className="inp"
-                            showSearch
-                            autoClearSearchValue
-                            placeholder="Selecciona un cliente"
-                            optionFilterProp="children"
-                            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-                            onChange={(value) => this.handleFilterTexts(value)}
-                        >
-                            {clientes && clientes.map((item, i) => (
-                                <Option key={i} value={item.id_cliente}>{item.nombre}</Option>
-                            ))}
-                        </Select>
-                    </div>
-                    <div className="col-md-2 offset-md-8 text-right mt-3">
+                    <div className="col-md-2 offset-md-10 text-right mt-3">
                         <Tooltip title="Permite configurar un nuevo texto dentro del sistema">
                             <Button
                                 type="primary"
@@ -88,7 +73,7 @@ class Text extends Component {
                     </div>
                 </div>
                 <Table
-                    data={_textos ? _textos : textos}
+                    data={textos}
                     arr={table}
                     handleEditEstado={this.handleEditEstado.bind(this)}
                     handleEdit={this.handleEdit.bind(this)}
@@ -97,21 +82,9 @@ class Text extends Component {
         );
     }
 
-    handleFilterTexts(value) {
-        this.setState({ _textos: undefined }, () => {
-            if (value != '' || value != null) {
-                const { textos } = this.props;
-                var _textos = textos.filter(item => {
-                    return item.id_cliente == value;
-                });
-                this.setState({ _textos });
-            }
-        });
-    }
-
     handleModal() {
         const { modal, id_texto, content, estado } = this.state;
-        const { clientes, images_activas } = this.props;
+        const { images_activas, operaciones, clientes_activos } = this.props;
         return (
             <Rodal
                 animation="flip"
@@ -121,7 +94,7 @@ class Text extends Component {
                 closeMaskOnClick
                 showCloseButton={true}
                 customStyles={{ borderRadius: 10 }}
-                width={window.innerWidth - 200}
+                width={window.innerWidth - 100}
                 height={window.innerHeight - 100}
             >
                 <div className="txt-mail">
@@ -139,7 +112,7 @@ class Text extends Component {
                             </Tooltip>
                         </div>
                         <div className="col-md-8 text-center">
-                            <p className="m-0 p-0 h-4">{id_texto ? 'EDITAR' : 'NUEVO'} TEXTO CORREO</p>
+                            <p className="m-0 p-0 h-4"><b>{id_texto ? 'EDITAR' : 'NUEVO'} TEXTO CORREO</b></p>
                         </div>
                     </div>
                     <div className="row">
@@ -147,10 +120,11 @@ class Text extends Component {
                             <Form
                                 edit={true}
                                 footer={true}
-                                options={{ clientes }}
+                                options={{ clientes_activos, operaciones }}
                                 arr={form}
                                 content={content}
                                 handleSubmit={this.handleSubmit.bind(this)}
+                                optionsChange={this.handleOptionsChange.bind(this)}
                             />
                         </div>
                         <div className="col-md-8">
@@ -167,6 +141,10 @@ class Text extends Component {
         );
     }
 
+    handleOptionsChange(value, res) {
+        this.props.dispatch(clientActions.getActivos({ 'id_operation': value }));
+    }
+
     handleSubmit(values) {
         const { content, id_texto, estado } = this.state;
         if (!Functions.validEmail(values.sender)) {
@@ -180,7 +158,7 @@ class Text extends Component {
         values.id_texto = id_texto;
         values.estado = (estado == true ? 0 : 1);
         values.body = content.body;
-        this.props.dispatch(clientActionts.addText(values));
+        this.props.dispatch(textActionts.addText(values));
         this.setState({
             id_texto: undefined,
             content: undefined,
@@ -204,11 +182,12 @@ class Text extends Component {
             id_texto: texto.id_texto,
             estado: (value == true ? 0 : 1)
         };
-        this.props.dispatch(clientActionts.changeStatusText(data));
+        this.props.dispatch(textActionts.changeStatusText(data));
     }
 
     handleEdit(texto) {
-        const estado = texto.suspendido == 1 ? true : false;
+        this.handleOptionsChange(texto.id_operation, texto);
+        const estado = texto.estado == 0 ? true : false;
         this.setState({
             estado,
             id_texto: texto.id_texto,
@@ -219,9 +198,10 @@ class Text extends Component {
 }
 
 function mapsStateToProps(state) {
-    const { _clients } = state;
-    const { clientes, textos, images_activas } = _clients;
-    return { clientes, textos, images_activas };
+    const { _clients, _texts } = state;
+    const { textos, images_activas } = _texts;
+    const { operaciones, clientes_activos } = _clients;
+    return { textos, images_activas, operaciones, clientes_activos };
 }
 
 export default connect(mapsStateToProps)(Text);

@@ -35,7 +35,8 @@ class Table extends Component {
                                             : (res.type == 3) ? this.handleStatus(res, i)
                                                 : (res.type == 4) ? this.handleOptios(res, i)
                                                     : (res.type == 5) ? this.handleNumber(res, i)
-                                                        : this.handleStatusEmal(res, i))
+                                                        : res.type == 6 ? this.handleStatusEmal(res, i)
+                                                            : this.handleDiscontinued(res, i))
                                 )
                             })
                         }
@@ -89,6 +90,21 @@ class Table extends Component {
     }
 
     handleStatus(res, i) {
+        return (
+            <AgGridColumn key={i} headerName={res.header} field={res.value} width={15} minWidth={100}
+                cellStyle={(param) => ((param.value == 1) ? { color: 'green' } : { color: 'red' })}
+                cellRendererFramework={(param) => {
+                    return (
+                        <div className="text-center">
+                            <FontAwesomeIcon icon={(param.value == 0) ? faUnlock : faLock} />&nbsp;{(param.value == 1) ? 'Activo' : 'Inactivo'}
+                        </div>
+                    );
+                }}
+            />
+        );
+    }
+
+    handleDiscontinued(res, i) {
         return (
             <AgGridColumn key={i} headerName={res.header} field={res.value} width={15} minWidth={100}
                 cellStyle={(param) => ((param.value == 0) ? { color: 'green' } : { color: 'red' })}
@@ -150,6 +166,10 @@ class Table extends Component {
                                 </button>
                             }
                             {res.status &&
+                                <Switch size="small" defaultChecked={(param.data.estado == 1) ? true : false}
+                                    onChange={(valor) => this.props.handleEditEstado(valor, param.data)} />
+                            }
+                            {res.discontinued &&
                                 <Switch size="small" defaultChecked={(param.data.estado == 0) ? true : false}
                                     onChange={(valor) => this.props.handleEditEstado(valor, param.data)} />
                             }

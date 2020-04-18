@@ -22,6 +22,11 @@ export default function _clients(state = {}, action) {
                 ...state,
                 clientes: action.clientes
             };
+        case ClientConstants.GET_CLIENTS_OPERATION:
+            return {
+                ...state,
+                clientes_operacion: action.clientes_operacion
+            };
         case ClientConstants.GET_CLIENT_ACT:
             return {
                 ...state,
@@ -32,25 +37,15 @@ export default function _clients(state = {}, action) {
                 ...state,
                 productos_cliente: action.productos_cliente
             };
-        case ClientConstants.GET_TEXT_CLIENT:
+        case ClientConstants.GET_OPERATION:
             return {
                 ...state,
-                textos_cliente: action.textos_cliente
+                operaciones: action.operaciones
             };
-        case ClientConstants.GET_TEXTS:
+        case ClientConstants.GET_PRODUCTS_OPERATION:
             return {
                 ...state,
-                textos: action.textos
-            };
-        case ClientConstants.GET_IMAGES:
-            return {
-                ...state,
-                images: action.images
-            };
-        case ClientConstants.GET_IMAGES_ACT:
-            return {
-                ...state,
-                images_activas: action.images_activas
+                productos_operacion: action.productos_operacion
             };
         default:
             return state

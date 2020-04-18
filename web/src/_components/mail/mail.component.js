@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { DatePicker, Tooltip, Button, Divider, Menu, Progress, Badge } from "antd";
+import { DatePicker, Tooltip, Button, Divider, Progress, Badge, Upload, Icon, Input } from "antd";
 import moment from "moment";
 import Rodal from "rodal";
 import { AsyncStorage } from "AsyncStorage";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faCheckDouble, faBan } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faCheckDouble, faBan, faMailBulk } from '@fortawesome/free-solid-svg-icons';
 
 import mailActionts from "../../_actionts/mail.actionts";
 import Table from "../../_helpers/Table";
@@ -13,27 +13,30 @@ import Form from "../../_helpers/Form";
 import clientActionts from "../../_actionts/client.actionts";
 import TextEditor from "../../_helpers/TextEditor";
 import Loading from "../../_helpers/Loading";
+import textActionts from "../../_actionts/text.actionts";
+import _server from "../../_services/server.services";
 
 require("moment/min/locales.min");
 moment.locale('es');
 
-const { Item } = Menu;
+const { Search } = Input;
 const table = [
+    { header: 'Nombre', value: 'nombre', filter: true, type: 1 },
     { header: 'Fecha', value: 'fecha_creacion', filter: true, type: 1 },
     { header: 'Fecha envio', value: 'fecha_envio', filter: true, type: 1 },
-    { header: 'Cliente', value: 'cliente', filter: true, type: 1 },
-    { header: 'Control', value: 'control', filter: true, type: 1 },
-    { header: 'Correo', value: 'email', filter: true, type: 1 },
-    { header: 'Detalle', value: 'descripcion', filter: true, type: 1 },
     { header: 'Usuario', value: 'usuario', filter: true, type: 1 },
+    { header: 'Control', value: 'control', filter: true, type: 1 },
+    { header: 'Correo', value: 'email', filter: true, type: 1 },    
     { header: 'Gestion', value: 'gestion', filter: true, type: 1 },
     { header: 'Enviado', value: 'enviado', filter: true, type: 6 }
 ];
 
 const form = [
+    { name: 'Operacion', value: 'id_operation', required: true, type: 7, option: 'operaciones', change: true },
     { name: 'Cliente', value: 'id_cliente', required: true, type: 7, option: 'clientes_activos', col: 6, change: true },
     { name: 'Producto', value: 'id_producto', required: true, type: 7, option: 'productos_cliente', col: 6 },
-    { name: 'Texto', value: 'id_texto', required: true, type: 7, option: 'textos_cliente', change: true }
+    { name: 'Estado', value: 'id_estado', required: false, type: 7, option: 'estados_act', col: 6 },
+    { name: 'Texto', value: 'id_texto', required: true, type: 7, option: 'textos_cliente', change: true, col: 6 }
 ];
 
 class Mail extends Component {
@@ -48,35 +51,45 @@ class Mail extends Component {
             user: undefined,
             body: '',
             modal_text: false,
-            modal_detalle: false
+            modal_detalle: false,
+            id_operation: null,
+            subiendo: false,
+            file: null
         };
     }
 
     componentDidMount() {
         this.handleGet();
+        this.props.dispatch(clientActionts.getOperation());
         AsyncStorage.getItem('login_massive', (err, res) => {
             if (!err && res && res != "undefined") {
                 var user = JSON.parse(res);
                 this.setState({ user: user });
             }
         });
-        this.props.dispatch(clientActionts.getActivos());
     }
 
     render() {
         const { date_start, date_end, modal, modal_text, modal_detalle } = this.state;
-        const { threads } = this.props;
+        const { threads, _disabled, _loading } = this.props;
         return (
             <div style={{ position: 'relative' }}>
                 {modal_detalle &&
                     this.handleModalDetalle()
                 }
-
                 {modal &&
                     this.handleModal()
                 }
                 {modal_text &&
                     this.handleModalText()
+                }
+
+                {_loading &&
+                    <div className="loading">
+                        <div className="loading-body">
+                            <Loading />
+                        </div>
+                    </div>
                 }
 
                 <div className="row">
@@ -137,11 +150,24 @@ class Mail extends Component {
                             <div className="row row-thread" key={i}>
                                 <div className="col-4 text-center">
                                     <p className="m-0 p-0 h6">{item.name}</p>
-                                    <p className="m-0 p-0">{item.usuario}/{item.fecha_creacion}</p>
+                                    <p className="m-0 p-0">{item.usuario}/{item.fecha_creacion}/{item.operacion}</p>
                                 </div>
-                                <div className="col-3 text-center">
+                                <div className="col-4 text-center">
                                     <div className="row">
-                                        <div className="col-md-3" onClick={() => this.handleDetalle(3, item)}>
+                                        <div className="col-md-3">
+                                            <Tooltip title="Total">
+                                                <Badge
+                                                    count={item.total}
+                                                    offset={[15, 0]}
+                                                    overflowCount={99999}
+                                                    showZero={true}
+                                                    style={{ backgroundColor: '#42a5f5' }}
+                                                >
+                                                    <FontAwesomeIcon icon={faMailBulk} color="#42a5f5" />
+                                                </Badge>
+                                            </Tooltip>
+                                        </div>
+                                        <div className="col-md-2" onClick={() => this.handleDetalle(3, item)}>
                                             <Tooltip title="Correo no valido">
                                                 <Badge
                                                     count={item.detalle && item.detalle[3] ? item.detalle[3] : 0}
@@ -153,7 +179,7 @@ class Mail extends Component {
                                                 </Badge>
                                             </Tooltip>
                                         </div>
-                                        <div className="col-md-3" onClick={() => this.handleDetalle(0, item)}>
+                                        <div className="col-md-2" onClick={() => this.handleDetalle(0, item)}>
                                             <Tooltip title="Pendiente de enviar">
                                                 <Badge
                                                     count={item.detalle && item.detalle[0] ? item.detalle[0] : 0}
@@ -179,7 +205,7 @@ class Mail extends Component {
                                             </Badge>
                                             </Tooltip>
                                         </div>
-                                        <div className="col-md-3" onClick={() => this.handleDetalle(2, item)}>
+                                        <div className="col-md-2" onClick={() => this.handleDetalle(2, item)}>
                                             <Tooltip title="Leido">
                                                 <Badge
                                                     count={item.detalle && item.detalle[2] ? item.detalle[2] : 0}
@@ -194,7 +220,7 @@ class Mail extends Component {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="col-4">
+                                <div className="col-3">
                                     <Progress percent={item.percentage} />
                                 </div>
                                 <div className="col-1 text-center">
@@ -204,6 +230,7 @@ class Mail extends Component {
                                         className="ml-1"
                                         size="small"
                                         icon={(item.send == item.length) ? 'redo' : ((item.status == 1) ? 'play-circle' : 'pause')}
+                                        disabled={_disabled}
                                         onClick={() => {
                                             if (item.send == item.length) {
                                                 const values = item;
@@ -235,8 +262,22 @@ class Mail extends Component {
     }
 
     handleModal() {
-        const { modal, content } = this.state;
-        const { clientes_activos, productos_cliente, textos_cliente, _disabled } = this.props;
+        const { modal, content, subiendo } = this.state;
+        const { clientes_activos, productos_cliente, textos_cliente, _disabled, operaciones, estados_act } = this.props;
+        const propsUpload = {
+            disabled: subiendo,
+            onRemove: () => { this.setState({ file: null }); },
+            onChange: (info) => {
+                info.file.status = "done";
+                this.setState({ subiendo: false })
+            },
+            multiple: false,
+            customRequest: ({ onSuccess, onError, file }) => {
+                this.setState({ subiendo: true, file });
+            },
+            accept: ".xls,.xlsx",
+            name: 'file',
+        };
         return (
             <Rodal
                 animation={'slideRight'}
@@ -246,10 +287,21 @@ class Mail extends Component {
                 closeMaskOnClick
                 showCloseButton={true}
                 customStyles={{ borderRadius: 10 }}
-                width={(window.innerWidth < 600 || window.innerHeight < 450 ? window.innerWidth : 600)}
-                height={(window.innerWidth < 600 || window.innerHeight < 450 ? window.innerHeight : 450)}
+                width={(window.innerWidth < 600 || window.innerHeight < 600 ? window.innerWidth : 600)}
+                height={(window.innerWidth < 600 || window.innerHeight < 500 ? window.innerHeight : 500)}
             >
                 <div>
+                    <div className="row">
+                        <div className="col-md-3 text-left">
+                            <Tooltip title="Formato para cargar archivo .xlsx">
+                                <Button type="primary" block icon="download" size="small">
+                                    <a href={`${_server._url}/public/file/formato.xls`} target="_blank" className="text-white">
+                                        Formato
+                                    </a>
+                                </Button>
+                            </Tooltip>
+                        </div>
+                    </div>
                     <div className="row">
                         <div className="col-12 text-center">
                             <p className="p-0 m-0 h4">
@@ -262,7 +314,13 @@ class Mail extends Component {
                     <Form
                         edit={true}
                         footer={true}
-                        options={{ clientes_activos, productos_cliente, textos_cliente }}
+                        options={{
+                            clientes_activos,
+                            productos_cliente,
+                            textos_cliente,
+                            operaciones,
+                            estados_act
+                        }}
                         arr={form}
                         disabled={_disabled}
                         content={content}
@@ -270,7 +328,21 @@ class Mail extends Component {
                         optionsChange={this.handleOptionsChange.bind(this)}
                     />
                     <div className="row">
-                        <div className="col-md-2 offset-md-10 text-right">
+                        <div className="col-md-10">
+                            <Tooltip title="Permite cargar una nueva imagen al sistema">
+                                <Upload
+                                    {...propsUpload}
+                                >
+                                    <Button
+                                        type="primary"
+                                        htmlType="button"
+                                    >
+                                        <Icon type="upload" /> Excel
+                                    </Button>
+                                </Upload>
+                            </Tooltip>
+                        </div>
+                        <div className="col-md-2 text-right">
                             <Tooltip title="Permite visualizar el mensaje a enviar">
                                 <Button type="primary" icon="file-search" shape="circle" onClick={() => this.setState({ modal_text: true })} />
                             </Tooltip>
@@ -294,16 +366,27 @@ class Mail extends Component {
     }
 
     handleAdd(values) {
-        const { user } = this.state;
+        const { user, file } = this.state;
         values.id_usuario = user.id_usuario;
+        values.file = file;
         this.props.dispatch(mailActionts.addLot(values));
+        this.setState({ file: null });
     }
 
     handleOptionsChange(value, res) {
         console.log(value, res);
-        if (res == 'id_cliente') {
-            this.props.dispatch(clientActionts.getProductoCliente({ 'id_cliente': value }));
-            this.props.dispatch(clientActionts.getTextoCliente({ 'id_cliente': value }));
+        if (res == 'id_operation') {
+            this.setState({ id_operation: value });
+            this.props.dispatch(clientActionts.getActivos({ 'id_operation': value }));
+        } else if (res == 'id_cliente') {
+            const { id_operation } = this.state;
+            var data = {
+                id_operation,
+                id_cliente: value
+            };
+            this.props.dispatch(clientActionts.getProductoCliente(data));
+            this.props.dispatch(textActionts.getTextoCliente(data));
+            this.props.dispatch(mailActionts.getEstadosAct(data));
         } else {
             const { textos_cliente } = this.props;
             var _textos_cliente = textos_cliente.filter(item => {
@@ -321,7 +404,7 @@ class Mail extends Component {
 
     handleModalDetalle() {
         const { mails } = this.props;
-        const { modal_detalle } = this.state;
+        const { modal_detalle, content } = this.state;
         return (
             <Rodal
                 animation={'slideLeft'}
@@ -331,8 +414,8 @@ class Mail extends Component {
                 closeMaskOnClick
                 showCloseButton={true}
                 customStyles={{ borderRadius: 10 }}
-                width={(window.innerWidth < 900 || window.innerHeight < 550 ? window.innerWidth : 900)}
-                height={(window.innerWidth < 900 || window.innerHeight < 550 ? window.innerHeight : 550)}
+                width={(window.innerWidth < 1000 || window.innerHeight < 550 ? window.innerWidth : 1000)}
+                height={(window.innerWidth < 1000 || window.innerHeight < 550 ? window.innerHeight : 550)}
             >
                 <div>
                     <div className="row">
@@ -342,8 +425,64 @@ class Mail extends Component {
                             </p>
                         </div>
                     </div>
-                    <Divider style={{ backgroundColor: '#4caf50' }} />
-                    <br /><br />
+                    <div className="row">
+                        <div className="col-md-4">
+                            <div className="row">
+                                <div className="col-6">
+                                    <Tooltip title="Permite filtrar registros por un rango de fechas"><b>Fecha Inicial:</b></Tooltip>
+                                    <DatePicker
+                                        className="inp"
+                                        format="DD-MM-YYYY"
+                                        onChange={(date) => {
+                                            if ( date != null ) {
+                                                var _conten = content;
+                                                _conten.date_start = date;
+                                                this.setState({ content: _conten }, () => {
+                                                    this.handleSearch();
+                                                });
+                                            }
+                                        }}
+                                        value={content && content.date_start ? content.date_start : moment()}
+                                    />
+                                </div>
+                                <div className="col-6">
+                                    <Tooltip title="Permite filtrar registros por un rango de fechas"><b>Fecha Fin:</b></Tooltip>
+                                    <DatePicker
+                                        className="inp"
+                                        format="DD-MM-YYYY"
+                                        onChange={(date) => {
+                                            if ( date != null ) {
+                                                var _conten = content;
+                                                _conten.date_end = date;
+                                                this.setState({ content: _conten }, () => {
+                                                    this.handleSearch();
+                                                });
+                                            }
+                                        }}
+                                        value={content && content.date_end ? content.date_end : moment()}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="col-md-4 text-center mt-3">
+                            <Search
+                                placeholder="Control"
+                                onSearch={(value) => {
+                                    this.handleSearch(value);
+                                }}
+                                enterButton
+                            />
+                        </div>
+                        <div className="col-md-4 text-right mt-3">
+                            <Tooltip title="Permite generar un archivo .xlsx">
+                                <Button type="primary" icon="download">
+                                    <a href={this.handleGetUrl()} target="_blank" className="text-white">
+                                        Reporte
+                                    </a>
+                                </Button>
+                            </Tooltip>
+                        </div>
+                    </div>
                     <div>
                         <Table
                             height="450px"
@@ -393,25 +532,57 @@ class Mail extends Component {
         this.props.dispatch(mailActionts.changeStatusThread(_thread));
     }
 
-    handleDetalle(send, thread) {
+    handleDetalle(send, thread) {        
         const data = {
-            'id_thread': thread.id_thread,
-            'enviado': send,
-            'date_start': moment(thread.fecha_creacion, "DD-MM-YYYY").format('YYYY-MM-DD'),
-            'date_end': moment(thread.fecha_creacion, "DD-MM-YYYY").format('YYYY-MM-DD'),
+            id_thread: thread.id_thread,
+            enviado: send,
+            date_start: moment(thread.fecha_creacion, "DD-MM-YYYY").format('YYYY-MM-DD'),
+            date_end: moment(thread.fecha_creacion, "DD-MM-YYYY").format('YYYY-MM-DD')            
         };
         this.props.dispatch(mailActionts.get(data));
         this.setState({
-            modal_detalle: true
+            modal_detalle: true,
+            content: {
+                enviado: send,
+                id_thread: thread.id_thread 
+            }
         });
+    }
+
+    handleSearch(control = '') {
+        const { content } = this.state;
+        const data = {
+            id_thread: content.id_thread,
+            enviado: content.enviado,
+            date_start: content.date_start ? content.date_start.format('YYYY-MM-DD') : moment().format('YYYY-MM-DD'),
+            date_end: content.date_end ? content.date_end.format('YYYY-MM-DD') : moment().format('YYYY-MM-DD'), 
+            control         
+        };
+        this.props.dispatch(mailActionts.get(data));
+        var _content = content; 
+        _content.control = control;
+        this.setState({ 
+            content: _content
+         })
+    }
+
+    handleGetUrl() {
+        const { content } = this.state;       
+        const date_start = content && content.date_start ? content.date_start.format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
+        const date_end = content && content.date_end ? content.date_end.format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
+        const control = content && content.control ? content.control : '';
+        const id_thread = content && content.id_thread ? content.id_thread : 0;
+        const enviado = content && content.enviado ? content.enviado : 0;
+        return `${_server._url}/src/report/outbound_correos.php?DTS=${date_start}$DTE=${date_end}&TH=${id_thread}&ENV=${enviado}&CNT=${control}`;
     }
 }
 
 function mapsStateToProps(state) {
-    const { _mails, _clients } = state;
-    const { mails, lote, threads, _disabled } = _mails;
-    const { clientes_activos, productos_cliente, textos_cliente } = _clients;
-    return { mails, lote, clientes_activos, productos_cliente, textos_cliente, threads, _disabled };
+    const { _mails, _clients, _texts } = state;
+    const { textos_cliente } = _texts;
+    const { mails, lote, threads, _disabled, estados_act, _loading } = _mails;
+    const { clientes_activos, productos_cliente, operaciones } = _clients;
+    return { mails, lote, clientes_activos, productos_cliente, textos_cliente, threads, _disabled, operaciones, estados_act, _loading };
 }
 
 export default connect(mapsStateToProps)(Mail);

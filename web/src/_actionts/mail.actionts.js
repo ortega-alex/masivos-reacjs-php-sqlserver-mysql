@@ -2,12 +2,11 @@ import { MailConstants } from '../_constants/index';
 import http from '../_services/http.services';
 import { AsyncStorage } from 'AsyncStorage';
 
-function request(_disabled = undefined) {
-    console.log(_disabled);
+function request( _loading = false, _disabled = undefined) {
     if (_disabled != undefined) {
-        return { type: MailConstants.REQUEST_MAIL, _disabled }
+        return { type: MailConstants.REQUEST_MAIL, _loading, _disabled }
     } else {
-        return { type: MailConstants.REQUEST_MAIL }
+        return { type: MailConstants.REQUEST_MAIL, _loading }
     }
 }
 function failure(err) { return { type: MailConstants.FAILURE_MAIL, err } }
@@ -15,10 +14,11 @@ function succes(msj, tipo) { return { type: MailConstants.SUCCESS_MAIL, msj, tip
 function getSucess(mails) { return { type: MailConstants.GET_MAIL, mails } }
 function getNotificationsThreadSuccess(notifications_thread, notification) { return { type: MailConstants.GET_NOTIFICATIONS_THREAD, notifications_thread, notification } }
 function getThreadsSuccess(threads) { return { type: MailConstants.GET_THREADS, threads } }
+function getEstadosActSuccess(estados_act) { return { type: MailConstants.GET_ESTADOS_ACT, estados_act } }
 
 function get(data) {
     return dispatch => {
-        dispatch(request());
+        dispatch(request(true));
         http._POST("mail/mail.php?get=true", data).then(res => {
             dispatch(getSucess(res.mails));
         }).catch(err => {
@@ -29,7 +29,7 @@ function get(data) {
 
 function addLot(data) {
     return dispatch => {
-        dispatch(request(true));
+        dispatch(request(false, true));
         http._POST("mail/mail.php?add_lot=true", data).then(res => {
             AsyncStorage.setItem(res.thread.id_thread, JSON.stringify(res)).then(() => {
                 dispatch(request(false));
@@ -88,7 +88,7 @@ function send(data) {
 
 function getThreads(data) {
     return dispatch => {
-        dispatch(request());
+        dispatch(request(true));
         http._POST("mail/mail.php?get_threads=true", data).then(res => {
             dispatch(getThreadsSuccess(res.threads));
         }).catch(err => {
@@ -152,10 +152,22 @@ function changeStatusThread(data) {
     }
 }
 
+function getEstadosAct(data) {
+    return dispatch => {
+        dispatch(request());
+        http._POST("mail/mail.php?get_management_status_act=true", data).then(res => {
+            dispatch(getEstadosActSuccess(res.estados_act));
+        }).catch(err => {
+            dispatch(failure(err.toString()));
+        });
+    }
+}
+
 export default {
     get,
     addLot,
     getThreads,
     removeNotificationThread,
-    changeStatusThread
+    changeStatusThread,
+    getEstadosAct
 };

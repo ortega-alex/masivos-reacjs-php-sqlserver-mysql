@@ -7,18 +7,21 @@ export default function _mails(state = {}, action) {
             if (action._disabled != undefined) {
                 return {
                     ...state,
-                    _disabled: action._disabled
+                    _disabled: action._disabled,
+                    _loading: action._loading
                 };
             } else {
                 return {
-                    ...state
+                    ...state,
+                    _loading: action._loading
                 };
             }
         case MailConstants.FAILURE_MAIL:
             Functions.message("error", action.err.toString());
             return {
                 ...state,
-                _disabled: false
+                _disabled: false,
+                _loading: false
             };
         case MailConstants.SUCCESS_MAIL:
             Functions.message(action.tipo, action.msj.toString());
@@ -28,6 +31,7 @@ export default function _mails(state = {}, action) {
         case MailConstants.GET_MAIL:
             return {
                 ...state,
+                _loading: false,
                 mails: action.mails
             };
         case MailConstants.GET_NOTIFICATIONS_THREAD:
@@ -39,13 +43,14 @@ export default function _mails(state = {}, action) {
         case MailConstants.GET_THREADS:
             return {
                 ...state,
+                _loading: false,
                 threads: action.threads
             };
-        // case MailConstants.OPEN_OR_CLOSE_PANEL:
-        //     return {
-        //         ...state,
-        //         modal_panel: action.modal_panel
-        //     };
+        case MailConstants.GET_ESTADOS_ACT:
+            return {
+                ...state,
+                estados_act: action.estados_act
+            };
         default:
             return state
     }

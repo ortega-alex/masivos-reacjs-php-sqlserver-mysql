@@ -72,7 +72,7 @@ code {
     padding: 10px 0px;
 }
 
-.ant-divider, .ant-col, .ant-form-item-label, .ant-form-item-required, .label {
+.ant-divider, .ant-col, .ant-form-item-label, .ant-form-item-required, .label, label {
     margin: 0px !important;
     padding: 0px !important;
 }
@@ -137,7 +137,7 @@ code {
 
 .thread-panel {
     width: 100%;
-    height: 68vh;
+    height: 65vh;
     overflow-x: hidden;
     overflow-y: auto;
     margin-top: 5px;
@@ -145,4 +145,22 @@ code {
     border-radius: 5px;
     box-shadow: 0px 5px 10px #909497;
     padding: 5px;
+}
+
+.loading {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: #8d8d8d;
+    opacity: 0.5;
+    top: 0px;
+    left: 0px;
+    z-index: 1000;
+}
+
+.loading-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 15%;
 }

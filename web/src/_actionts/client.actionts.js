@@ -5,12 +5,11 @@ function request() { return { type: ClientConstants.REQUEST_CLIENT } }
 function failure(err) { return { type: ClientConstants.FAILURE_CLIENT, err } }
 function succes(msj, tipo) { return { type: ClientConstants.SUCCESS_CLIENT, msj, tipo } }
 function getSucess(clientes) { return { type: ClientConstants.GET_CLIENTS, clientes } }
+function getClientOperationSucess(clientes_operacion) { return { type: ClientConstants.GET_CLIENTS_OPERATION, clientes_operacion } }
 function getActSucess(clientes_activos) { return { type: ClientConstants.GET_CLIENT_ACT, clientes_activos } }
 function getProductoClienteSucess(productos_cliente) { return { type: ClientConstants.GET_PRODUC_CLIENT, productos_cliente } }
-function getTextoClienteSuccess(textos_cliente) { return { type: ClientConstants.GET_TEXT_CLIENT, textos_cliente } }
-function getTextsSuccess(textos) { return { type: ClientConstants.GET_TEXTS, textos } }
-function getImagesSuccess(images) { return { type: ClientConstants.GET_IMAGES, images } }
-function getImagesActSuccess(images_activas) { return { type: ClientConstants.GET_IMAGES_ACT, images_activas } }
+function getOperationSuccess(operaciones) { return { type: ClientConstants.GET_OPERATION, operaciones } }
+function getProductOperationSucess(productos_operacion) { return { type: ClientConstants.GET_PRODUCTS_OPERATION, productos_operacion } }
 
 function get() {
     return dispatch => {
@@ -23,10 +22,37 @@ function get() {
     }
 }
 
-function getActivos() {
+function getClientOperation(data) {
     return dispatch => {
         dispatch(request());
-        http._GET("client/client.php?get_activos=true").then(res => {
+        http._POST("client/client.php?get_client_operation=true", data).then(res => {
+            dispatch(getClientOperationSucess(res.clientes_operacion));
+        }).catch(err => {
+            dispatch(failure(err.toString()));
+        });
+    }
+}
+
+function add(data) {
+    return dispatch => {
+        dispatch(request());
+        http._POST("client/client.php?add=true", data).then(res => {
+            if (res.err == 'false') {
+                dispatch(getClientOperation(data));
+                dispatch(succes(res.msj, 'success'));
+            } else {
+                dispatch(succes(res.msj, 'warning'));
+            }
+        }).catch(err => {
+            dispatch(failure(err.toString()));
+        });
+    }
+}
+
+function getActivos(data) {
+    return dispatch => {
+        dispatch(request());
+        http._POST("client/client.php?get_activos=true", data).then(res => {
             dispatch(getActSucess(res.clientes_activos));
         }).catch(err => {
             dispatch(failure(err.toString()));
@@ -45,37 +71,26 @@ function getProductoCliente(data) {
     }
 }
 
-function getTextoCliente(data) {
+function getOperation() {
     return dispatch => {
         dispatch(request());
-        http._POST("client/client.php?get_textos_cliente=true", data).then(res => {
-            dispatch(getTextoClienteSuccess(res.textos_cliente));
+        http._GET("client/client.php?get_operation=true").then(res => {
+            dispatch(getOperationSuccess(res.operaciones));
         }).catch(err => {
             dispatch(failure(err.toString()));
         });
     }
 }
 
-function getTextos() {
+function changeStatus(data) {
     return dispatch => {
         dispatch(request());
-        http._GET("client/client.php?get_textos=true").then(res => {
-            dispatch(getTextsSuccess(res.textos));
-        }).catch(err => {
-            dispatch(failure(err.toString()));
-        });
-    }
-}
-
-function addText(data) {
-    return dispatch => {
-        dispatch(request());
-        http._POST("client/client.php?add_text=true", data).then(res => {
+        http._POST("client/client.php?change_status=true", data).then(res => {
             if (res.err == 'false') {
+                dispatch(getClientOperation(data));
                 dispatch(succes(res.msj, 'success'));
-                dispatch(getTextos());
             } else {
-                dispatch(succes(res.msj, 'error'));
+                dispatch(succes(res.msj, 'warning'));
             }
         }).catch(err => {
             dispatch(failure(err.toString()));
@@ -83,15 +98,26 @@ function addText(data) {
     }
 }
 
-function changeStatusText(data) {
+function getProductOperation(data) {
     return dispatch => {
         dispatch(request());
-        http._POST("client/client.php?change_status_text=true", data).then(res => {
+        http._POST("client/client.php?get_product_operation=true", data).then(res => {
+            dispatch(getProductOperationSucess(res.productos_operacion));
+        }).catch(err => {
+            dispatch(failure(err.toString()));
+        });
+    }
+}
+
+function addProduct(data) {
+    return dispatch => {
+        dispatch(request());
+        http._POST("client/client.php?add_produto=true", data).then(res => {
             if (res.err == 'false') {
+                dispatch(getProductOperation(data));
                 dispatch(succes(res.msj, 'success'));
-                dispatch(getTextos());
             } else {
-                dispatch(succes(res.msj, 'error'));
+                dispatch(succes(res.msj, 'warning'));
             }
         }).catch(err => {
             dispatch(failure(err.toString()));
@@ -99,53 +125,15 @@ function changeStatusText(data) {
     }
 }
 
-function getImages() {
+function changeStatusProduct(data) {
     return dispatch => {
         dispatch(request());
-        http._GET("client/client.php?get_images=true").then(res => {
-            dispatch(getImagesSuccess(res.images));
-        }).catch(err => {
-            dispatch(failure(err.toString()));
-        });
-    }
-}
-
-function getImagesACT() {
-    return dispatch => {
-        dispatch(request());
-        http._GET("client/client.php?get_images_activas=true").then(res => {
-            dispatch(getImagesActSuccess(res.images_activas));
-        }).catch(err => {
-            dispatch(failure(err.toString()));
-        });
-    }
-}
-
-function addImage(data) {
-    return dispatch => {
-        dispatch(request());
-        http._POST("client/client.php?add_image=true", data).then(res => {
+        http._POST("client/client.php?change_status_product=true", data).then(res => {
             if (res.err == 'false') {
+                dispatch(getProductOperation(data));
                 dispatch(succes(res.msj, 'success'));
-                dispatch(getImages());
             } else {
-                dispatch(succes(res.msj, 'error'));
-            }
-        }).catch(err => {
-            dispatch(failure(err.toString()));
-        });
-    }
-}
-
-function changeStatusImage(data) {
-    return dispatch => {
-        dispatch(request());
-        http._POST("client/client.php?change_status_image=true", data).then(res => {
-            if (res.err == 'false') {
-                dispatch(succes(res.msj, 'success'));
-                dispatch(getImages());
-            } else {
-                dispatch(succes(res.msj, 'error'));
+                dispatch(succes(res.msj, 'warning'));
             }
         }).catch(err => {
             dispatch(failure(err.toString()));
@@ -157,12 +145,11 @@ export default {
     get,
     getActivos,
     getProductoCliente,
-    getTextoCliente,
-    getTextos,
-    addText,
-    changeStatusText,
-    getImages,
-    getImagesACT,
-    addImage,
-    changeStatusImage
+    getOperation,
+    getClientOperation,
+    add,
+    changeStatus,
+    getProductOperation,
+    addProduct,
+    changeStatusProduct
 };

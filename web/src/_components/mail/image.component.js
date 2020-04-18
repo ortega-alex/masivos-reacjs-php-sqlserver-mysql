@@ -2,14 +2,14 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Tooltip, Button, Upload, Icon } from "antd";
 
-import clientActionts from "../../_actionts/client.actionts";
+import textActionts from "../../_actionts/text.actionts";
 import Table from "../../_helpers/Table";
 
 const table = [
     { header: 'Fecha', value: 'fecha', filter: true, type: 1 },
     { header: 'Titulo', value: 'title', filter: true, type: 1 },
-    { header: 'Estado', value: 'estado', filter: true, type: 3 },
-    { header: 'Opciones', value: null, filter: false, type: 4, status: true }
+    { header: 'Estado', value: 'estado', filter: true, type: 7 },
+    { header: 'Opciones', value: null, filter: false, type: 4, discontinued: true }
 ];
 
 class Image extends Component {
@@ -26,7 +26,7 @@ class Image extends Component {
     }
 
     componentDidMount() {
-        this.props.dispatch(clientActionts.getImages());
+        this.props.dispatch(textActionts.getImages());
     }
 
     render() {
@@ -42,7 +42,7 @@ class Image extends Component {
             multiple: false,
             customRequest: ({ onSuccess, onError, file }) => {
                 this.setState({ subiendo: true, file });
-                this.props.dispatch(clientActionts.addImage({ file }));
+                this.props.dispatch(textActionts.addImage({ file }));
             },
             accept: ".jpg",
             listType: "picture",
@@ -88,13 +88,13 @@ class Image extends Component {
             id_image: image.id_image,
             estado: (value == true ? 0 : 1)
         };
-        this.props.dispatch(clientActionts.changeStatusImage(data));
+        this.props.dispatch(textActionts.changeStatusImage(data));
     }
 }
 
 function mapsStateToProps(state) {
-    const { _clients } = state;
-    const { images } = _clients;
+    const { _texts } = state;
+    const { images } = _texts;
     return { images };
 }
 

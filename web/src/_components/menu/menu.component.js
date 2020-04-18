@@ -11,6 +11,8 @@ import Notification from "../../_helpers/Notification";
 import mailActionts from '../../_actionts/mail.actionts';
 import Text from "../mail/text.component";
 import Image from "../mail/image.component";
+import ClientTMK from '../client_product/clientTMK.component';
+import  ProductTMK from "../client_product/productTMK.component";
 
 const { Item, SubMenu } = MenuAntd;
 
@@ -80,22 +82,65 @@ class Menu extends Component {
                             <Icon type="user" />
                             <span>{user.nombre}</span>
                         </Item>
-                        <Item key="/imagenes">
-                            <Link to="/imagenes"
-                                onClick={() => { this.setState({ pathname: "/imagenes" }) }}
-                            >
-                                <Icon type="file-image" />
-                                <span>Imagenes</span>
-                            </Link>
-                        </Item>
-                        <Item key="/textos">
-                            <Link to="/textos"
-                                onClick={() => { this.setState({ pathname: "/textos" }) }}
-                            >
-                                <Icon type="file-done" />
-                                <span>Textos</span>
-                            </Link>
-                        </Item>
+                        <SubMenu
+                            title={
+                                <span>
+                                    <Icon type="usergroup-add" />
+                                    <span>Clientes</span>
+                                </span>
+                            }
+                        >
+                            <Item key="/client_tmk">
+                                <Link to="/client_tmk"
+                                    onClick={() => { this.setState({ pathname: "/client_tmk" }) }}
+                                >
+                                    <Icon type="credit-card" />
+                                    <span>TMK</span>
+                                </Link>
+                            </Item>
+                        </SubMenu>
+                        <SubMenu
+                            title={
+                                <span>
+                                    <Icon type="mail" />
+                                    <span>Correo</span>
+                                </span>
+                            }
+                        >
+                            <Item key="/imagenes">
+                                <Link to="/imagenes"
+                                    onClick={() => { this.setState({ pathname: "/imagenes" }) }}
+                                >
+                                    <Icon type="file-image" />
+                                    <span>Imagenes</span>
+                                </Link>
+                            </Item>
+                            <Item key="/textos">
+                                <Link to="/textos"
+                                    onClick={() => { this.setState({ pathname: "/textos" }) }}
+                                >
+                                    <Icon type="file-done" />
+                                    <span>Textos</span>
+                                </Link>
+                            </Item>
+                        </SubMenu>
+                        <SubMenu
+                            title={
+                                <span>
+                                    <Icon type="usergroup-add" />
+                                    <span>Productos</span>
+                                </span>
+                            }
+                        >
+                            <Item key="/product_tmk">
+                                <Link to="/product_tmk"
+                                    onClick={() => { this.setState({ pathname: "/product_tmk" }) }}
+                                >
+                                    <Icon type="credit-card" />
+                                    <span>TMK</span>
+                                </Link>
+                            </Item>
+                        </SubMenu>
                         <Item onClick={this.cerrarSession.bind(this)}>
                             <Icon type="logout" />
                             <span>Cerrar session</span>
@@ -108,6 +153,8 @@ class Menu extends Component {
                     <Route path="/message" component={Message} />
                     <Route path="/textos" component={Text} />
                     <Route path="/imagenes" component={Image} />
+                    <Route path="/client_tmk" component={ClientTMK} />
+                    <Route path="/product_tmk" component={ProductTMK} />
                 </div>
             </HashRouter>
         );
