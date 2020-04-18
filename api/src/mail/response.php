@@ -12,11 +12,11 @@ require_once '../config/dbClassMysql.php';
 $con = new dbClassMysql();
 $intdIdOutboundCorreos = isset($_GET['OUT']) ? intval($_GET['OUT']) : 0;
 
-$strQuery = "   SELECT a.id_thread, a.id_usuario_envia, a.control, a.email, a.enviado,
-                    b.name, b.fecha_creacion, b.id_operation, b.id_cliente,
+$strQuery = "   SELECT a.id_usuario_envia, a.control, a.email, a.enviado,
+                    b.id_thread, b.name, b.fecha_creacion, b.id_operation, b.id_cliente,
                     c.login AS usuario
                 FROM masivos.dbo.outbound_correos a
-                INNER JOIN masivos.dbo.thread b ON a.id_thread = b.id_thread
+                INNER JOIN masivos.dbo.thread b ON a.id_thread2 = b.id_thread
                 INNER JOIN oca_sac.dbo.usuarios c ON a.id_usuario_envia = c.id_usuario
                 WHERE a.Id_outbound_correos = {$intdIdOutboundCorreos}";
 $qTmp = $_con->db_consulta($strQuery);

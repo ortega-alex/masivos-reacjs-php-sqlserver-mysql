@@ -46,12 +46,12 @@ $intIdEstado = isset($_POST['id_estado']) ? intval($_POST['id_estado']) : 0;
 $strControl = isset($_POST['control']) ? trim($_POST['control']) : null;
 
 if (isset($_GET['get'])) {
-    $_AND = (!empty($strControl) && $strControl != null) ? "AND a.control = '{$strControl}'" : "AND a.id_thread = {$intIdThread}";
+    $_AND = (!empty($strControl) && $strControl != null) ? "AND a.control = '{$strControl}'" : "AND a.id_thread2 = {$intIdThread}";
     $strQuery = "   SELECT a.Id_outbound_correos, a.control, a.email, a.enviado, a.fecha_envio, a.fecha_creacion, management_status,
                         b.id_thread, b.name AS nombre,
                         c.id_usuario, c.login AS usuario                    
                     FROM masivos.dbo.outbound_correos a
-                    INNER JOIN masivos.dbo.thread b ON a.id_thread = b.id_thread
+                    INNER JOIN masivos.dbo.thread b ON a.id_thread2 = b.id_thread
                     INNER JOIN oca_sac.dbo.usuarios c ON a.id_usuario_envia = c.id_usuario
                     WHERE a.fecha_creacion BETWEEN '{$dtDateStart}' AND '{$dtDateEnd}'
                     AND a.enviado = {$intEnviado}
@@ -151,8 +151,10 @@ if (isset($_GET['add_lot'])) {
                         $intEnviado = 3;
                     }
 
-                    $strQuery1 = "  INSERT INTO masivos.dbo.outbound_correos (control, email, id_texto , id_usuario_envia, enviado, fecha_envio, id_thread, management_status )
-                                    VALUES ('{$rTmp->control}', '{$rTmp->email}', {$intIdTexto}, {$intIdUsuario}, {$intEnviado}, NULL, {$intIdThread}, '{$rTmp->descripcion}')";
+                    $strQuery1 = "  INSERT INTO masivos.dbo.outbound_correos (control, email, id_texto , id_usuario_envia, enviado, 
+                                                                                fecha_envio, id_thread, id_thread2, management_status )
+                                    VALUES ('{$rTmp->control}', '{$rTmp->email}', {$intIdTexto}, {$intIdUsuario}, {$intEnviado},
+                                             NULL, NULL, {$intIdThread}, '{$rTmp->descripcion}')";
                     if ($_con->db_consulta($strQuery1)) {
                         $intIdOutboundCorreos = $_con->db_last_id('masivos.dbo.outbound_correos');
                         $strQuery1 = "  INSERT INTO masivos.dbo.customer_data ( id_outbound_correos, no_cuenta, nombre_completo, direccion, tarjeta )
@@ -225,8 +227,9 @@ if (isset($_GET['add_lot'])) {
                         $intEnviado = 3;
                     }
 
-                    $strQuery1 = "  INSERT INTO masivos.dbo.outbound_correos (control, email, id_texto , id_usuario_envia, enviado, fecha_envio, id_thread, management_status )
-                                    VALUES ('{$rTmp->control}', '{$rTmp->email}', {$intIdTexto}, {$intIdUsuario}, {$intEnviado}, NULL, {$intIdThread}, '{$rTmp->descripcion}')";
+                    $strQuery1 = "  INSERT INTO masivos.dbo.outbound_correos (control, email, id_texto , id_usuario_envia, enviado,
+                                                                                fecha_envio, id_thread, id_thread2, management_status )
+                                    VALUES ('{$rTmp->control}', '{$rTmp->email}', {$intIdTexto}, {$intIdUsuario}, {$intEnviado}, NULL, NULL, {$intIdThread}, '{$rTmp->descripcion}')";
                     if ($_con->db_consulta($strQuery1)) {
                         $intIdOutboundCorreos = $_con->db_last_id('masivos.dbo.outbound_correos');
                         $strQuery1 = "  INSERT INTO masivos.dbo.customer_data ( id_outbound_correos, no_cuenta, nombre_completo, direccion, tarjeta )
@@ -271,8 +274,10 @@ if (isset($_GET['add_lot'])) {
                     $intEnviado = 3;
                 }
 
-                $strQuery = "   INSERT INTO masivos.dbo.outbound_correos (control, email, id_texto , id_usuario_envia, enviado, fecha_envio, id_thread, management_status )
-                                VALUES ('{$strControl}', '{$strEmail}', {$intIdTexto}, {$intIdUsuario}, {$intEnviado}, NULL, {$intIdThread}, 'EXCEL')";
+                $strQuery = "   INSERT INTO masivos.dbo.outbound_correos (control, email, id_texto , id_usuario_envia, enviado,
+                                                                            fecha_envio, id_thread, id_thread2, management_status )
+                                VALUES ('{$strControl}', '{$strEmail}', {$intIdTexto}, {$intIdUsuario}, {$intEnviado},
+                                         NULL, NULL, {$intIdThread}, 'EXCEL')";
                 if ($_con->db_consulta($strQuery)) {
                     $intIdOutboundCorreos = $_con->db_last_id('masivos.dbo.outbound_correos');
                     $strQuery = "   INSERT INTO masivos.dbo.customer_data ( id_outbound_correos, no_cuenta, nombre_completo, direccion, tarjeta )
@@ -287,10 +292,10 @@ if (isset($_GET['add_lot'])) {
                         b.id_producto, b.id_cliente,
                         c.no_cuenta AS cuenta, c.nombre_completo AS nombre, c.direccion, c.tarjeta
                     FROM masivos.dbo.outbound_correos a
-                    INNER JOIN masivos.dbo.thread b ON a.id_thread = b.id_thread
+                    INNER JOIN masivos.dbo.thread b ON a.id_thread2 = b.id_thread
                     INNER JOIN masivos.dbo.customer_data c ON a.Id_outbound_correos = c.id_outbound_correos
                     WHERE a.enviado = 0
-                    AND a.id_thread = {$intIdThread}";
+                    AND a.id_thread2 = {$intIdThread}";
 
     $qTmp = $_con->db_consulta($strQuery);
 
@@ -469,7 +474,7 @@ if (isset($_GET['send'])) {
 }
 
 if (isset($_GET['get_threads'])) {
-    $strQuery = "    SELECT a.id_thread, a.id_cliente, a.id_producto, a.id_texto, a.name,
+    $strQuery = "   SELECT a.id_thread, a.id_cliente, a.id_producto, a.id_texto, a.name,
                         a.fecha_creacion, a.send, a.percentage, a.length, a.status,
                         a.nombre_archivo, a.path, a.id_operation,
                         b.id_usuario, b.login,
@@ -486,7 +491,7 @@ if (isset($_GET['get_threads'])) {
 
         $strQuery1 = "  SELECT enviado, COUNT(*) AS total
                         FROM masivos.dbo.outbound_correos
-                        WHERE id_thread = $rTmp->id_thread
+                        WHERE id_thread2 = $rTmp->id_thread
                         GROUP BY enviado";
         $qTmp1 = $_con->db_consulta($strQuery1);
         $arrDetalle = array();
@@ -543,7 +548,7 @@ if (isset($_GET['get_management_status_act'])) {
         $qTmp = $_con->db_consulta($strQuery);
         while ($rTmp = $_con->db_fetch_object($qTmp)) {
             $arr[] = array(
-                'id_status' => $rTmp->id_gestion_clave,
+                'id_estado' => $rTmp->id_gestion_clave,
                 'nombre' => mb_convert_encoding($rTmp->descripcion, "UTF-8"),
             );
         }

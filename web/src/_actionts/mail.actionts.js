@@ -32,7 +32,7 @@ function addLot(data) {
         dispatch(request(false, true));
         http._POST("mail/mail.php?add_lot=true", data).then(res => {
             AsyncStorage.setItem(res.thread.id_thread, JSON.stringify(res)).then(() => {
-                dispatch(request(false));
+                dispatch(request(false, false));
                 dispatch(getThreads(data));
                 dispatch(sendLot(res.thread));
             });
@@ -88,7 +88,7 @@ function send(data) {
 
 function getThreads(data) {
     return dispatch => {
-        dispatch(request(true));
+        dispatch(request(true, false));
         http._POST("mail/mail.php?get_threads=true", data).then(res => {
             dispatch(getThreadsSuccess(res.threads));
         }).catch(err => {

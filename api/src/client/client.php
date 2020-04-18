@@ -224,7 +224,7 @@ if (isset($_GET['get_product_operation'])) {
                             b.id_cliente, b.descripcion AS cliente
                         FROM tmk_ventas.cat_producto a
                         INNER JOIN tmk_ventas.cat_clientes b ON a.id_cliente = b.id_cliente
-                        ORDER BY nombre DESC";
+                        ORDER BY cliente, nombre DESC";
         $qTmp = $con->db_consulta($strQuery);
         while ($rTmp = $con->db_fetch_object($qTmp)) {
             $arr[] = array(

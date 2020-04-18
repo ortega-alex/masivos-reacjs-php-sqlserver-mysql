@@ -65,7 +65,7 @@ $objPHPExcel->setActiveSheetIndex(0)
     ->setCellValue('G1', 'ESTADO GESTION')
     ->setCellValue('H1', 'ESTADO');
 
-$_AND = (!empty($strControl) && $strControl != null) ? "AND a.control = '{$strControl}'" : "AND a.id_thread = {$intIdThread}";
+$_AND = (!empty($strControl) && $strControl != null) ? "AND a.control = '{$strControl}'" : "AND a.id_thread2 = {$intIdThread}";
 $strQuery = "   SELECT a.control, a.email, a.enviado, a.fecha_creacion, a.fecha_envio, a.management_status,
                     CASE
                         WHEN a.enviado = 0 THEN 'PENDIENTE DE ENVIAR'
@@ -76,7 +76,7 @@ $strQuery = "   SELECT a.control, a.email, a.enviado, a.fecha_creacion, a.fecha_
                     b.name,
                     c.login
                 FROM masivos.dbo.outbound_correos a
-                INNER JOIN masivos.dbo.thread b ON a.id_thread = b.id_thread
+                INNER JOIN masivos.dbo.thread b ON a.id_thread2 = b.id_thread
                 INNER JOIN oca_sac.dbo.usuarios c ON a.id_usuario_envia = c.id_usuario
                 WHERE a.fecha_creacion BETWEEN '{$dtDateStart}' AND '{$dtDateEnd}'
                 AND a.enviado = {$intEnviado}

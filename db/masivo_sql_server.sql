@@ -22,7 +22,7 @@ CREATE TABLE masivos.dbo.customer_data (
 ------------------------------------------------------------------------------
 
 CREATE TABLE masivos.dbo.operation (
-	id_operation int IDENTITY(0,1) NOT NULL,
+	id_operation int IDENTITY(1,1) NOT NULL,
 	name varchar(200) COLLATE Modern_Spanish_CI_AS NOT NULL,
 	state char(1) COLLATE Modern_Spanish_CI_AS NULL,
 	creation_date datetime NULL
@@ -56,8 +56,9 @@ CREATE TABLE masivos.dbo.[image] (
 --  esto con el fin de poder manejar mas de dos estados (0 = no enviado,    --
 --  1 = enviado, 2 = leido, 3 = error ) y si fuese necesario algun otro.    --
 ------------------------------------------------------------------------------
+-- Drop table
 
-ALTER TABLE masivos.dbo.outbound_correos ADD enviado char(1) DEFAULT 0 NULL GO
+-- DROP TABLE masivos.dbo.outbound_correos GO
 
 CREATE TABLE masivos.dbo.outbound_correos (
 	Id_outbound_correos int IDENTITY(1,1) NOT NULL,
@@ -70,8 +71,8 @@ CREATE TABLE masivos.dbo.outbound_correos (
 	fecha_creacion datetime NULL,
 	id_thread varchar(6) COLLATE Modern_Spanish_CI_AS NULL,
 	procesado bit NULL,
-	id_gestion_clave int NULL,
-	management text COLLATE Modern_Spanish_CI_AS NULL,
+	management_status varchar(100) COLLATE Modern_Spanish_CI_AS NULL,
+	id_thread2 int NULL,
 	CONSTRAINT PK_outbound_correos PRIMARY KEY (Id_outbound_correos)
 ) GO
 
