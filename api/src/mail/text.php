@@ -171,6 +171,7 @@ if (isset($_GET['get_images'])) {
 }
 
 if (isset($_GET['get_images_activas'])) {
+    $_url = "http://168.234.50.2:8080/dev/masivo/api/public/img/";
     $strQuery = "   SELECT id_image, title, value
                     FROM masivos.dbo.image
                     WHERE estado = 0
