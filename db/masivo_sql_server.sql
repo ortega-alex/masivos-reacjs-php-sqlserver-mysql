@@ -1,3 +1,40 @@
+----------------------------------------------------------------------------------
+--                      2020-04-16  MARLON ORTEGA                           	--
+--  nueva tabla customer_data, permite guardar los datos del cliente			--
+--	recuperados de las diferentes bases de datos y excel cargados al sistema	--
+----------------------------------------------------------------------------------
+
+CREATE TABLE masivos.dbo.customer_data (
+	id_customer_data int IDENTITY(0,1) NOT NULL,
+	id_outbound_correos int NOT NULL,
+	no_cuenta varchar(100) NULL,
+	nombre_completo varchar(100) NULL,
+	direccion varchar(100) NULL,
+	tarjeta varchar(100) NULL,
+	estado char(1) DEFAULT 1 NULL,
+	fecha_creacion datetime DEFAULT getDate() NULL
+) GO
+
+------------------------------------------------------------------------------
+--                      2020-04-14  MARLON ORTEGA                           --
+--  nueva tabla operacion, permite administrar los nombres como 			--
+--	cobros, tmk, claro etc. dentro del sistema 		    					--
+------------------------------------------------------------------------------
+
+CREATE TABLE masivos.dbo.operation (
+	id_operation int IDENTITY(0,1) NOT NULL,
+	name varchar(200) COLLATE Modern_Spanish_CI_AS NOT NULL,
+	state char(1) COLLATE Modern_Spanish_CI_AS NULL,
+	creation_date datetime NULL
+) GO
+
+------------------------------------------------------------------------------
+--                      2020-04-14  MARLON ORTEGA                           --
+--  propiedad operacion, permite la separacion entre cobros y tmk 		    --
+------------------------------------------------------------------------------
+
+ALTER TABLE masivos.dbo.correos_textos ADD id_operation int NOT NULL GO
+
 ------------------------------------------------------------------------------
 --                      2020-04-12  MARLON ORTEGA                           --
 --  permite cargar las imagenes personalizadas para los textos a enviar     --
@@ -55,5 +92,8 @@ CREATE TABLE masivos.dbo.thread (
 	send int NULL,
 	percentage int NULL,
 	[length] int NULL,
-	status bit NULL
+	status bit NULL,
+	nombre_archivo varchar(100) COLLATE Modern_Spanish_CI_AS NULL,
+	[path] varchar(100) COLLATE Modern_Spanish_CI_AS NULL,
+	id_operation int NULL
 ) GO

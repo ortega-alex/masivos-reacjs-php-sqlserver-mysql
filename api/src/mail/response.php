@@ -1,7 +1,5 @@
 <?php
 
-require_once "../../libs/phpmailer/class.phpmailer.php";
-require_once "../../libs/phpmailer/class.smtp.php";
 require_once '../config/helper.php';
 if (extension_loaded('mssql')) {
     require_once '../config/dbClassMSSQL.php';
@@ -10,84 +8,47 @@ if (extension_loaded('mssql')) {
     require_once '../config/dbClassPDO.php';
     $_con = new dbClassPDO();
 }
+require_once '../config/dbClassMysql.php';
+$con = new dbClassMysql();
 $intdIdOutboundCorreos = isset($_GET['OUT']) ? intval($_GET['OUT']) : 0;
 
-try {
-    $strQuery = "   SELECT a.control, a.fecha_envio, a.email, a.management,
-                        b.name, b.id_usuario,
-                        c.sender,
-                        d.nombre_completo
-                    FROM masivos.dbo.outbound_correos a
-                    INNER JOIN masivos.dbo.thread b ON a.id_thread = b.id_thread
-                    INNER JOIN masivos.dbo.correos_textos c ON b.id_texto = c.Id_texto
-                    INNER JOIN oca_sac.dbo.remesas_cuentas d ON a.control = d.control
-                    WHERE a.Id_outbound_correos = {$intdIdOutboundCorreos}";
-    $qTmp = $_con->db_consulta($strQuery);
-    $rTmp = $_con->db_fetch_assoc($qTmp);
-    $_fecha = date('d-m-Y H:m:s', strtotime($rTmp['fecha_envio']));
+$strQuery = "   SELECT a.id_thread, a.id_usuario_envia, a.control, a.email, a.enviado,
+                    b.name, b.fecha_creacion, b.id_operation, b.id_cliente,
+                    c.login AS usuario
+                FROM masivos.dbo.outbound_correos a
+                INNER JOIN masivos.dbo.thread b ON a.id_thread = b.id_thread
+                INNER JOIN oca_sac.dbo.usuarios c ON a.id_usuario_envia = c.id_usuario
+                WHERE a.Id_outbound_correos = {$intdIdOutboundCorreos}";
+$qTmp = $_con->db_consulta($strQuery);
+$rTmp = $_con->db_fetch_assoc($qTmp);
 
-    $mail = new PHPMailer();
-    $mail->IsSMTP();
-    $mail->SMTPSecure = "ssl";
-    $mail->SMTPAuth = true;
+if ($rTmp['enviado'] != 2) {
+    $_fecha = date('d-m-Y', strtotime($rTmp['fecha_creacion']));
 
-    $mail->Host = "mail.ocacall.com"; // SMTP a utilizar. Por ej. smtp.elserver.com
-    $mail->Username = "helpdesk@ocacall.com"; // Correo completo a utilizar
-    $mail->Password = "Ge@FAG8C8km-QC9fNAb9x@XT5b!ytHRk3nK7FN4hq=9dQ"; // Contraseña
+    $_db = $rTmp['id_operation'] == 1 ? "oca_sac" :
+    ($rTmp['id_cliente'] == 1 ? 'tmk_ventas' :
+        ($rTmp['id_cliente'] == 2 ? 'tmk_tarjetas_promerica' : 'sm_sos'));
+    $_arr = array(
+        'db' => $_db,
+        'id_operation' => $rTmp['id_operation'],
+        'id_usuario' => $rTmp['id_usuario_envia'],
+        'control' => $rTmp['control'],
+        'gestion' => "CORREO LEIDO: {$rTmp['email']}, LT: {$rTmp['id_thread']}, NMB: {$rTmp['name']}, FCH: {$_fecha}. US: {$rTmp['usuario']}",
+    );
+    $__con = $objThread->id_operation == 1 ? $_con : $con;
+    insertManagement($_arr, $__con);
 
-    $mail->Port = 465; // Puerto a utilizar
-    $mail->From = "sistema@ocacall.com"; // Desde donde enviamos (Para mostrar)
-    $mail->FromName = "NOTIFICACION DE RECEPCION DE CORREO";
-    $mail->Subject = "CORREO LEIDO"; // Este es el titulo del email.
-    $mail->IsHTML(true); // El correo se envía como HTML
+    $strQuery = "   UPDATE masivos.dbo.outbound_correos
+                    SET enviado  = 2
+                    WHERE Id_outbound_correos = {$intdIdOutboundCorreos}";
+    $_con->db_consulta($strQuery);
+}
 
-    // $mail->AddAddress($rTmp['sender']); // Esta es la dirección a donde enviamos
-    $mail->AddAddress("mortegalex27@gmail.com");
-
-    $mail->Body = " <div style='text-align: center;'>
-                        <b>Fecha de envió: " . $_fecha . "</b>
-                        <br/>
-                        <b>Correo: " . $rTmp['email'] . " </b>
-                        <br/>
-                        <b>Control: " . $rTmp['control'] . "</b>
-                        <br/>
-                        <b>Nombre: " . $rTmp['nombre_completo'] . "</b>
-                        <br/>
-                        <b>Lote: " . $rTmp['name'] . "</b>
-                        <br>
-                        <p style='margin: 0px; padding: 0px;'>
-                            El cliente a leído el correo.
-                        </p>
-                    </div>";
-
-    $mail->CharSet = 'UTF-8';
-    $exito = $mail->Send(); //Envía el correo.
-
-    if ($exito) {
-        $strQuery = "   UPDATE masivos.dbo.outbound_correos
-                        SET enviado  = 2
-                        WHERE Id_outbound_correos = {$intdIdOutboundCorreos}";
-        $_con->db_consulta($strQuery);
-        $_arr = array(
-            'id_usuario' => $rTmp['id_usuario'],
-            'control' => $rTmp['control'],
-            'gestion' => "LECTURA DE CORREO " . $rTmp['management'],
-        );
-        insertManagement($_arr, $_con);
-
-        $_img = "../../public/img/ocaicon.png";
-        if (file_exists($_img)) {
-            header('Content-Type: image/png');
-            readfile($_img);
-            exit;
-        } else {
-            echo "no existe:" . $_img;
-        }
-
-    } else {
-        echo json_encode("Hubo un inconveniente. Contacta a un administrador.");
-    }
-
-} catch (Exception $e) {
-    print(json_encode('Excepción capturada: ' . $e->getMessage()));
+$_img = "../../public/img/logo_oca.png";
+if (file_exists($_img)) {
+    header('Content-Type: image/png');
+    readfile($_img);
+    exit;
+} else {
+    echo "no existe:" . $_img;
 }
