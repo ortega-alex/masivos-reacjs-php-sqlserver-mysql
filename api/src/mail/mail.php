@@ -418,7 +418,10 @@ if (isset($_GET['send'])) {
             $_fecha = ' ' . date('d') . ' DE ' . nameMonth(date('n')) . ' DE ' . date('Y');
             $fecha = date('Y-m-d H:m:s');
             foreach ($arrLote as $key => &$value) {
-                $_arr = array($value->cuenta, $value->nombre, $value->direccion, $_fecha);
+                $_cuenta = isset($value->cuenta) ? $value->cuenta : '';
+                $_nombre = isset($value->nombre) ? $value->nombre : '';
+                $_direccion = isset($value->direccion) ? $value->direccion : '';
+                $_arr = array($_cuenta, $_nombre, $_direccion, $_fecha);
                 $_body = str_replace($arr_temp, $_arr, $objThread->body);
                 $mail->Body = $_body . "<br/><br/> <img src='http://168.234.50.2:8080/dev/masivo/api/src/mail/response.php?OUT=" . $value->Id_outbound_correos . "' />";
 

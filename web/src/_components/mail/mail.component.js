@@ -145,7 +145,7 @@ class Mail extends Component {
                 </div>
 
                 <div className="thread-panel">
-                    {threads && threads.map((item, i) => {
+                    {(threads && threads.length > 0) ? threads.map((item, i) => {                        
                         return (
                             <div className="row row-thread" key={i}>
                                 <div className="col-4 text-center">
@@ -243,7 +243,9 @@ class Mail extends Component {
                                 </div>
                             </div>
                         )
-                    })}
+                    })
+                    : <p className="mt-1 w-100 text-center" style={{ opacity: '0.5' }}><b>SIN INFORMACION</b></p>
+                    }
                 </div>
             </div>
         );

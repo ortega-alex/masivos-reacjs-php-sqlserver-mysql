@@ -1,7 +1,11 @@
 import { TextConstants } from '../_constants/index';
 import http from '../_services/http.services';
+import Functions from "../_helpers/Functions";
 
-function request() { return { type: TextConstants.REQUEST_TEXT } }
+function request() { 
+    Functions.validateSession();
+    return { type: TextConstants.REQUEST_TEXT } 
+}
 function failure(err) { return { type: TextConstants.FAILURE_TEXT, err } }
 function succes(msj, tipo) { return { type: TextConstants.SUCCESS_TEXT, msj, tipo } }
 function getSuccess(textos) { return { type: TextConstants.GET_TEXTS, textos } }

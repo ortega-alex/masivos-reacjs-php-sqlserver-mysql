@@ -1,8 +1,10 @@
 import { MailConstants } from '../_constants/index';
 import http from '../_services/http.services';
 import { AsyncStorage } from 'AsyncStorage';
+import Functions from "../_helpers/Functions";
 
 function request( _loading = false, _disabled = undefined) {
+    Functions.validateSession();
     if (_disabled != undefined) {
         return { type: MailConstants.REQUEST_MAIL, _loading, _disabled }
     } else {

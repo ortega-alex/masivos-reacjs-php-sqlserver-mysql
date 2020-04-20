@@ -1,7 +1,11 @@
 import { ClientConstants } from '../_constants/index';
 import http from '../_services/http.services';
+import Functions from "../_helpers/Functions";
 
-function request() { return { type: ClientConstants.REQUEST_CLIENT } }
+function request() { 
+    Functions.validateSession();
+    return { type: ClientConstants.REQUEST_CLIENT } 
+}
 function failure(err) { return { type: ClientConstants.FAILURE_CLIENT, err } }
 function succes(msj, tipo) { return { type: ClientConstants.SUCCESS_CLIENT, msj, tipo } }
 function getSucess(clientes) { return { type: ClientConstants.GET_CLIENTS, clientes } }
