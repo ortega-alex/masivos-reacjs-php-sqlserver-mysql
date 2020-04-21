@@ -36,7 +36,8 @@ function addLot(data) {
             AsyncStorage.setItem(res.thread.id_thread, JSON.stringify(res)).then(() => {
                 dispatch(request(false, false));
                 dispatch(getThreads(data));
-                dispatch(sendLot(res.thread));
+                dispatch(succes(res.msj, 'success'));
+                // dispatch(sendLot(res.thread));
             });
         }).catch(err => {
             dispatch(failure(err.toString()));

@@ -5,7 +5,8 @@ class dbClassPDO
     public function __construct()
     {
         try {
-            $this->conexion = new PDO('odbc:Driver={SQL Server};Server=172.29.11.176; Database=oca_sac; Uid=sa;Pwd=oca;');
+            // $this->conexion = new PDO('odbc:Driver={SQL Server};Server=172.29.11.176; Database=oca_sac; Uid=sa;Pwd=oca;');
+            $this->conexion = new PDO('odbc:Driver={SQL Server};Server=172.29.10.20; Database=oca_sac; Uid=sa;Pwd=oca;');
         } catch (PDOException $e) {
             print "¡Error!: " . $e->getMessage() . "<br/>";
             die();

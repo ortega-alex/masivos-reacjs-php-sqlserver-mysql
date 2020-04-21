@@ -4,7 +4,8 @@ class dbClassMSSQL
     public $conexion;
     public function __construct()
     {
-        $this->conexion = mssql_connect('172.29.11.176', 'sa', 'oca') or die("Connect Error server");
+        // $this->conexion = mssql_connect('172.29.10.176', 'sa', 'oca') or die("Connect Error server");
+        $this->conexion = mssql_connect('172.29.10.20', 'sa', 'oca') or die("Connect Error server");
         mssql_select_db('oca_sac', $this->conexion) or die("Problemas al  seleccionar la base de datos oca_sac");
     }
 

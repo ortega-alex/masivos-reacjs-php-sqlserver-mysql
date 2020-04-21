@@ -49,7 +49,7 @@ if (isset($_GET['get'])) {
     $_AND = (!empty($strControl) && $strControl != null) ? "AND a.control = '{$strControl}'" : "AND a.id_thread2 = {$intIdThread}";
     $strQuery = "   SELECT a.Id_outbound_correos, a.control, a.email, a.enviado, a.fecha_envio, a.fecha_creacion, management_status,
                         b.id_thread, b.name AS nombre,
-                        c.id_usuario, c.login AS usuario                    
+                        c.id_usuario, c.login AS usuario
                     FROM masivos.dbo.outbound_correos a
                     INNER JOIN masivos.dbo.thread b ON a.id_thread2 = b.id_thread
                     INNER JOIN oca_sac.dbo.usuarios c ON a.id_usuario_envia = c.id_usuario
@@ -71,7 +71,7 @@ if (isset($_GET['get'])) {
             'id_usuario' => $rTmp->id_usuario,
             'usuario' => $rTmp->usuario,
             'gestion' => $rTmp->management_status,
-            'nombre' => $rTmp->nombre
+            'nombre' => $rTmp->nombre,
         );
     }
     $res['mails'] = $arr;
@@ -115,9 +115,9 @@ if (isset($_GET['add_lot'])) {
         }
 
         $strQuery = "   INSERT INTO masivos.dbo.thread (id_usuario, Id_texto, id_cliente, id_producto, name,
-                                                        send, percentage, nombre_archivo, path, id_operation)
+                                                        send, percentage, nombre_archivo, path, id_operation, status)
                         VALUES ( {$intIdUsuario}, {$intIdTexto}, {$intIdCliente}, {$intIdProducto}, '{$strNombre}',
-                                 0, 0, '{$strNombreArchivo}', '{$strPath}', $intIdOperation)";
+                                 0, 0, '{$strNombreArchivo}', '{$strPath}', $intIdOperation, 1)";
         if ($_con->db_consulta($strQuery)) {
             $intIdThread = $_con->db_last_id('masivos.dbo.thread');
         }
@@ -151,7 +151,7 @@ if (isset($_GET['add_lot'])) {
                         $intEnviado = 3;
                     }
 
-                    $strQuery1 = "  INSERT INTO masivos.dbo.outbound_correos (control, email, id_texto , id_usuario_envia, enviado, 
+                    $strQuery1 = "  INSERT INTO masivos.dbo.outbound_correos (control, email, id_texto , id_usuario_envia, enviado,
                                                                                 fecha_envio, id_thread, id_thread2, management_status )
                                     VALUES ('{$rTmp->control}', '{$rTmp->email}', {$intIdTexto}, {$intIdUsuario}, {$intEnviado},
                                              NULL, NULL, {$intIdThread}, '{$rTmp->descripcion}')";
@@ -362,9 +362,10 @@ if (isset($_GET['add_lot'])) {
                     WHERE a.id_thread = {$intIdThread}";
     $qTmp = $_con->db_consulta($strQuery);
     $rTmp = $_con->db_fetch_assoc($qTmp);
+    $_name = mb_convert_encoding(($rTmp['name']), "UTF-8");
     $arrThread = array(
         'id_thread' => $rTmp['id_thread'],
-        'name' => mb_convert_encoding(($rTmp['name']), "UTF-8"),
+        'name' => $_name,
         'id_texto' => $rTmp['Id_texto'],
         'subject' => mb_convert_encoding(($rTmp['subject']), "UTF-8"),
         'body' => mb_convert_encoding(($rTmp['body']), "UTF-8"),
@@ -383,6 +384,7 @@ if (isset($_GET['add_lot'])) {
     );
     $res['lote'] = $arr;
     $res['thread'] = $arrThread;
+    $res['msj'] = "Campaña {$_name} creada exitosamente";
 }
 
 if (isset($_GET['send'])) {
@@ -397,20 +399,20 @@ if (isset($_GET['send'])) {
             $res['pausar'] = "true";
             $res['thread'] = $objThread;
         } else {
-            $mail = new PHPMailer();
-            $mail->IsSMTP();
-            $mail->SMTPSecure = "ssl";
-            $mail->SMTPAuth = true;
+            // $mail = new PHPMailer();
+            // $mail->IsSMTP();
+            // $mail->SMTPSecure = "ssl";
+            // $mail->SMTPAuth = true;
 
-            $mail->Host = "mail.ocacall.com"; // SMTP a utilizar. Por ej. smtp.elserver.com
-            $mail->Username = "helpdesk@ocacall.com"; // Correo completo a utilizar
-            $mail->Password = "Ge@FAG8C8km-QC9fNAb9x@XT5b!ytHRk3nK7FN4hq=9dQ"; // Contraseña
+            // $mail->Host = "mail.ocacall.com"; // SMTP a utilizar. Por ej. smtp.elserver.com
+            // $mail->Username = "helpdesk@ocacall.com"; // Correo completo a utilizar
+            // $mail->Password = "Ge@FAG8C8km-QC9fNAb9x@XT5b!ytHRk3nK7FN4hq=9dQ"; // Contraseña
 
-            $mail->Port = 465; // Puerto a utilizar
-            $mail->From = $objThread->sender; // Desde donde enviamos (Para mostrar)
-            $mail->FromName = "OCA"; //$strTitle;
-            $mail->Subject = $objThread->subject; // Este es el titulo del email.
-            $mail->IsHTML(true); // El correo se envía como HTML
+            // $mail->Port = 465; // Puerto a utilizar
+            // $mail->From = $objThread->sender; // Desde donde enviamos (Para mostrar)
+            // $mail->FromName =  $objThread->subject; //$strTitle;
+            // $mail->Subject = $objThread->subject; // Este es el titulo del email.
+            // $mail->IsHTML(true); // El correo se envía como HTML
 
             $arr_temp = array(
                 '$cuenta', '$nombre', '$direccion', '$fecha',
@@ -423,9 +425,9 @@ if (isset($_GET['send'])) {
                 $_direccion = isset($value->direccion) ? $value->direccion : '';
                 $_arr = array($_cuenta, $_nombre, $_direccion, $_fecha);
                 $_body = str_replace($arr_temp, $_arr, $objThread->body);
-                $mail->Body = $_body . "<br/><br/> <img src='http://168.234.50.2:8080/dev/masivo/api/src/mail/response.php?OUT=" . $value->Id_outbound_correos . "' />";
-
-                $mail->AddAddress("{$value->email}");
+                // $mail->Body = $_body . "<br/><br/> <img src='http://168.234.50.2:8080/dev/masivo/api/src/mail/response.php?OUT=" . $value->Id_outbound_correos . "' />";
+                // $mail->addCustomHeader('OUT', $value->Id_outbound_correos);
+                // $mail->AddAddress("{$value->email}");
 
                 $_db = $objThread->id_operation == 1 ? "oca_sac" :
                 ($objThread->id_cliente == 1 ? 'tmk_ventas' :
@@ -448,12 +450,12 @@ if (isset($_GET['send'])) {
                                 WHERE Id_outbound_correos = {$value->Id_outbound_correos}";
                 $_con->db_consulta($strQuery);
 
-                $mail->CharSet = 'UTF-8';
-                $exito = $mail->Send(); //Envía el correo.
+                // $mail->CharSet = 'UTF-8';
+                // $exito = $mail->Send(); //Envía el correo.
 
-                if ($exito) {
-                    $mail->clearAddresses();
-                }
+                // if ($exito) {
+                //     $mail->clearAddresses();
+                // }
             }
 
             $objThread->send = $objThread->send + 1;
@@ -486,6 +488,7 @@ if (isset($_GET['get_threads'])) {
                     INNER JOIN oca_sac.dbo.usuarios b ON a.id_usuario = b.id_usuario
                     INNER JOIN masivos.dbo.operation c ON a.id_operation = c.id_operation
                     WHERE a.fecha_creacion BETWEEN '{$dtDateStart}' AND '{$dtDateEnd}'
+                    AND a.status != 2
                     ORDER BY a.fecha_creacion DESC";
 
     $qTmp = $_con->db_consulta($strQuery);
@@ -547,6 +550,7 @@ if (isset($_GET['get_management_status_act'])) {
         $strQuery = "   SELECT id_gestion_clave, descripcion
                         FROM oca_sac.dbo.gestiones_claves
                         WHERE suspendido = 0
+                        AND id_tipo_gestion = 1
                         ORDER BY descripcion";
         $qTmp = $_con->db_consulta($strQuery);
         while ($rTmp = $_con->db_fetch_object($qTmp)) {
@@ -572,6 +576,22 @@ if (isset($_GET['get_management_status_act'])) {
         }
     }
     $res['estados_act'] = $arr;
+}
+
+if (isset($_GET['read'])) {
+    if (extension_loaded('imap')) {
+        echo "SI <br/>";
+        $inbox = imap_open('{172.29.10.102:465/pop3}INBOX', 'helpdesk@ocacall.com', 'Ge@FAG8C8km-QC9fNAb9x@XT5b!ytHRk3nK7FN4hq=9dQ')
+        or die('Cannot connect: ' . imap_last_error());
+    } else {
+        echo "NO <br/>";
+    }
+
+    $connection = fsockopen('172.29.10.102', 465, $errno, $errstr, 30);
+    fputs($connection, "helpdesk@ocacall.com");
+    fputs($connection, "Ge@FAG8C8km-QC9fNAb9x@XT5b!ytHRk3nK7FN4hq=9dQ");
+    echo fgets($connection);
+    exit();
 }
 
 print(json_encode($res));

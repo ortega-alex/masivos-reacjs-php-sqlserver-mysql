@@ -4,7 +4,8 @@ class dbClassMysql
 
     public function __construct()
     {
-        $this->conexion = new mysqli('172.29.10.105', 'esaavedra', 'EsAAv20166', 'tmk_ventas');
+        // $this->conexion = new mysqli('172.29.10.105', 'esaavedra', 'EsAAv20166', 'tmk_ventas');
+        $this->conexion = new mysqli('172.29.11.26', 'esaavedra', 'EsAAv2016', 'tmk_ventas');
         if ($this->conexion->connect_error) {
             die('Connect Error(' . $this->conexion->connect_errno . ') ' . $this->conexion->connect_error);
         }

@@ -26,7 +26,7 @@ const table = [
     { header: 'Fecha envio', value: 'fecha_envio', filter: true, type: 1 },
     { header: 'Usuario', value: 'usuario', filter: true, type: 1 },
     { header: 'Control', value: 'control', filter: true, type: 1 },
-    { header: 'Correo', value: 'email', filter: true, type: 1 },    
+    { header: 'Correo', value: 'email', filter: true, type: 1 },
     { header: 'Gestion', value: 'gestion', filter: true, type: 1 },
     { header: 'Enviado', value: 'enviado', filter: true, type: 6 }
 ];
@@ -145,7 +145,7 @@ class Mail extends Component {
                 </div>
 
                 <div className="thread-panel">
-                    {(threads && threads.length > 0) ? threads.map((item, i) => {                        
+                    {(threads && threads.length > 0) ? threads.map((item, i) => {
                         return (
                             <div className="row row-thread" key={i}>
                                 <div className="col-4 text-center">
@@ -226,7 +226,6 @@ class Mail extends Component {
                                 <div className="col-1 text-center">
                                     <Button
                                         type="primary"
-                                        icon="redo"
                                         className="ml-1"
                                         size="small"
                                         icon={(item.send == item.length) ? 'redo' : ((item.status == 1) ? 'play-circle' : 'pause')}
@@ -240,11 +239,20 @@ class Mail extends Component {
                                             }
                                         }}
                                     />
+                                    <Tooltip title="Permite eliminar la campaña seleccionada!">
+                                        <Button
+                                            type="danger"
+                                            icon="delete"
+                                            className="ml-1"
+                                            size="small"
+                                            onClick={() => this.handleActios(item, 2)}
+                                        />
+                                    </Tooltip>
                                 </div>
                             </div>
                         )
                     })
-                    : <p className="mt-1 w-100 text-center" style={{ opacity: '0.5' }}><b>SIN INFORMACION</b></p>
+                        : <p className="mt-1 w-100 text-center" style={{ opacity: '0.5' }}><b>SIN INFORMACION</b></p>
                     }
                 </div>
             </div>
@@ -372,7 +380,7 @@ class Mail extends Component {
         values.id_usuario = user.id_usuario;
         values.file = file;
         this.props.dispatch(mailActionts.addLot(values));
-        this.setState({ file: null });
+        this.setState({ file: null, modal: false });
     }
 
     handleOptionsChange(value, res) {
@@ -436,7 +444,7 @@ class Mail extends Component {
                                         className="inp"
                                         format="DD-MM-YYYY"
                                         onChange={(date) => {
-                                            if ( date != null ) {
+                                            if (date != null) {
                                                 var _conten = content;
                                                 _conten.date_start = date;
                                                 this.setState({ content: _conten }, () => {
@@ -453,7 +461,7 @@ class Mail extends Component {
                                         className="inp"
                                         format="DD-MM-YYYY"
                                         onChange={(date) => {
-                                            if ( date != null ) {
+                                            if (date != null) {
                                                 var _conten = content;
                                                 _conten.date_end = date;
                                                 this.setState({ content: _conten }, () => {
@@ -527,26 +535,30 @@ class Mail extends Component {
         );
     }
 
-    handleActios(thread) {
+    handleActios(thread, status = null) {
         var _thread = thread;
         _thread.get_thread = 1;
-        _thread.status = thread.status == 1 ? 0 : 1;
+        if (status == null) {
+            _thread.status = thread.status == 1 ? 0 : 1;
+        } else {
+            _thread.status = status;
+        }
         this.props.dispatch(mailActionts.changeStatusThread(_thread));
     }
 
-    handleDetalle(send, thread) {        
+    handleDetalle(send, thread) {
         const data = {
             id_thread: thread.id_thread,
             enviado: send,
             date_start: moment(thread.fecha_creacion, "DD-MM-YYYY").format('YYYY-MM-DD'),
-            date_end: moment(thread.fecha_creacion, "DD-MM-YYYY").format('YYYY-MM-DD')            
+            date_end: moment(thread.fecha_creacion, "DD-MM-YYYY").format('YYYY-MM-DD')
         };
         this.props.dispatch(mailActionts.get(data));
         this.setState({
             modal_detalle: true,
             content: {
                 enviado: send,
-                id_thread: thread.id_thread 
+                id_thread: thread.id_thread
             }
         });
     }
@@ -557,19 +569,19 @@ class Mail extends Component {
             id_thread: content.id_thread,
             enviado: content.enviado,
             date_start: content.date_start ? content.date_start.format('YYYY-MM-DD') : moment().format('YYYY-MM-DD'),
-            date_end: content.date_end ? content.date_end.format('YYYY-MM-DD') : moment().format('YYYY-MM-DD'), 
-            control         
+            date_end: content.date_end ? content.date_end.format('YYYY-MM-DD') : moment().format('YYYY-MM-DD'),
+            control
         };
         this.props.dispatch(mailActionts.get(data));
-        var _content = content; 
+        var _content = content;
         _content.control = control;
-        this.setState({ 
+        this.setState({
             content: _content
-         })
+        })
     }
 
     handleGetUrl() {
-        const { content } = this.state;       
+        const { content } = this.state;
         const date_start = content && content.date_start ? content.date_start.format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
         const date_end = content && content.date_end ? content.date_end.format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
         const control = content && content.control ? content.control : '';
