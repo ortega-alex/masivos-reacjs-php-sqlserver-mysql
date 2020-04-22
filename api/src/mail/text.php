@@ -130,8 +130,6 @@ if (isset($_GET['add'])) {
         $strQuery = "   INSERT INTO masivos.dbo.correos_textos (id_cliente, id_operation, subject, body, descripcion, sender, individual, suspendido)
                         VALUES ({$intIdCliente}, {$intIdOperation}, '{$strSubject}', '{$strBody}', '{$strDescripcion}', '{$strSender}', 0, {$intEstado})";
     }
-    print($strQuery);
-
     if ($_con->db_consulta($strQuery)) {
         $res['err'] = 'false';
         $res['msj'] = "Texto guardado exitosamente!";
@@ -171,7 +169,7 @@ if (isset($_GET['get_images'])) {
 }
 
 if (isset($_GET['get_images_activas'])) {
-    $_url = "http://168.234.50.2:8080/dev/masivo/api/public/img/";
+    $_url = getUrlServer() . "/api/public/img/";
     $strQuery = "   SELECT id_image, title, value
                     FROM masivos.dbo.image
                     WHERE estado = 0

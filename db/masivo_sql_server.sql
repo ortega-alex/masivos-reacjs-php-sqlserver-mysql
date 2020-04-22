@@ -1,4 +1,23 @@
 ----------------------------------------------------------------------------------
+--                      2020-04-21  MARLON ORTEGA                           	--
+--  nueva propiedad response, guarda el ultimo correo de respuesta del cliente	--
+----------------------------------------------------------------------------------
+
+ALTER TABLE masivos.dbo.outbound_correos ADD response text NULL GO
+
+----------------------------------------------------------------------------------
+--                      2020-04-21  MARLON ORTEGA                           	--
+--  	nueva tabla black list, lista de correos que rebotaron, esto con el		--
+--							fin de no crear spam								--
+----------------------------------------------------------------------------------
+
+CREATE TABLE masivos.dbo.black_list (
+	id_black_list int IDENTITY(0,1) NOT NULL,
+	email varchar(100) NULL,
+	fecha datetime DEFAULT getdate() NULL
+) GO
+
+----------------------------------------------------------------------------------
 --                      2020-04-16  MARLON ORTEGA                           	--
 --  nueva tabla customer_data, permite guardar los datos del cliente			--
 --	recuperados de las diferentes bases de datos y excel cargados al sistema	--
@@ -54,7 +73,8 @@ CREATE TABLE masivos.dbo.[image] (
 --                      2020-04-01  MARLON ORTEGA                           --
 --  Se realizo cambio de propiedad de atributo enviado de bit a char        --
 --  esto con el fin de poder manejar mas de dos estados (0 = no enviado,    --
---  1 = enviado, 2 = leido, 3 = error ) y si fuese necesario algun otro.    --
+--  1 = enviado, 2 = leido, 3 = error, 4 = cliente respondio ) y si fuese 	--
+--							necesario algun otro.						    --
 ------------------------------------------------------------------------------
 -- Drop table
 

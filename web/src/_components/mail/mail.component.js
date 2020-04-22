@@ -5,7 +5,7 @@ import moment from "moment";
 import Rodal from "rodal";
 import { AsyncStorage } from "AsyncStorage";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faCheckDouble, faBan, faMailBulk } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faCheckDouble, faBan, faMailBulk, faInbox } from '@fortawesome/free-solid-svg-icons';
 
 import mailActionts from "../../_actionts/mail.actionts";
 import Table from "../../_helpers/Table";
@@ -27,7 +27,8 @@ const table = [
     { header: 'Usuario', value: 'usuario', filter: true, type: 1 },
     { header: 'Control', value: 'control', filter: true, type: 1 },
     { header: 'Correo', value: 'email', filter: true, type: 1 },
-    { header: 'Gestion', value: 'gestion', filter: true, type: 1 },
+    { header: 'Respuesta', value: 'respuesta', filter: true, type: 1 },
+    { header: 'Estado', value: 'gestion', filter: true, type: 1 },
     { header: 'Enviado', value: 'enviado', filter: true, type: 6 }
 ];
 
@@ -154,7 +155,7 @@ class Mail extends Component {
                                 </div>
                                 <div className="col-4 text-center">
                                     <div className="row">
-                                        <div className="col-md-3">
+                                        <div className="col-md-2">
                                             <Tooltip title="Total">
                                                 <Badge
                                                     count={item.total}
@@ -192,7 +193,7 @@ class Mail extends Component {
                                                 </Badge>
                                             </Tooltip>
                                         </div>
-                                        <div className="col-md-3" onClick={() => this.handleDetalle(1, item)}>
+                                        <div className="col-md-2" onClick={() => this.handleDetalle(1, item)}>
                                             <Tooltip title="Enviado">
                                                 <Badge
                                                     count={item.detalle && item.detalle[1] ? item.detalle[1] : 0}
@@ -215,6 +216,19 @@ class Mail extends Component {
                                                     style={{ backgroundColor: 'green' }}
                                                 >
                                                     <FontAwesomeIcon icon={faCheckDouble} color="green" />&nbsp;&nbsp;&nbsp;
+                                            </Badge>
+                                            </Tooltip>
+                                        </div>
+                                        <div className="col-md-2" onClick={() => this.handleDetalle(4, item)}>
+                                            <Tooltip title="El cliente ha respondido">
+                                                <Badge
+                                                    count={item.detalle && item.detalle[4] ? item.detalle[4] : 0}
+                                                    offset={[15, 0]}
+                                                    overflowCount={99999}
+                                                    showZero
+                                                    style={{ backgroundColor: '#ab47bc' }}
+                                                >
+                                                    <FontAwesomeIcon icon={faInbox} color="#ab47bc" />&nbsp;&nbsp;&nbsp;
                                             </Badge>
                                             </Tooltip>
                                         </div>

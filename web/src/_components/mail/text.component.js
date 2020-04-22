@@ -147,6 +147,7 @@ class Text extends Component {
 
     handleSubmit(values) {
         const { content, id_texto, estado } = this.state;
+      
         if (!Functions.validEmail(values.sender)) {
             Functions.message('warning', 'por favor ingrese un correo valido!');
             return;
@@ -154,11 +155,13 @@ class Text extends Component {
         if (!content || !content.body) {
             Functions.message('warning', 'por favor ingrese un texto!');
             return;
-        }
+        }        
+      
         values.id_texto = id_texto;
         values.estado = (estado == true ? 0 : 1);
         values.body = content.body;
-        this.props.dispatch(textActionts.addText(values));
+        
+        this.props.dispatch(textActionts.add(values));
         this.setState({
             id_texto: undefined,
             content: undefined,

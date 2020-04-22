@@ -53,12 +53,12 @@ function multiple(valor, multiple) {
 }
 
 async function validateSession() {
-    await AsyncStorage.getItem('login_masivo', (err, res) => {
+    await AsyncStorage.getItem('login_massive', (err, res) => {
         if (!err && res && res != "undefined") {
             var usuario = JSON.parse(res);
             var actual = moment();
             if (usuario.fecha && actual.diff(usuario.fecha, 'hours') >= 8) {
-                AsyncStorage.setItem('login_tickets', undefined).then(() => {
+                AsyncStorage.setItem('login_massive', undefined).then(() => {
                     window.location.reload(true);
                 });
             }
@@ -71,6 +71,17 @@ function validEmail(text) {
     return reg.test(text);
 }
 
+function getColors(state) {
+    const _arr = [
+        '#90a4ae',
+        '#81c784',
+        '#43a047',
+        '#e0e0e0',
+        '#ab47bc'
+    ];
+    return _arr[state];
+}
+
 export default {
     removeTildes,
     replaceSpaces,
@@ -80,5 +91,6 @@ export default {
     itHasLetters,
     multiple,
     validateSession,
-    validEmail
+    validEmail,
+    getColors
 };
